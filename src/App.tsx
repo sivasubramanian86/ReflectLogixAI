@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppShell } from './components/AppShell';
 import { EntryHistoryList } from './components/EntryHistoryList';
 import { JournalEditor } from './components/JournalEditor';
 import { ReflectionCard } from './components/ReflectionCard';
 import { ConversationThread } from './components/ConversationThread';
 import { RightInsightsPane } from './components/RightInsightsPane';
-import { AgentWorkflowInspector } from './components/AgentWorkflowInspector';
 import { KnowledgeGraphView } from './components/KnowledgeGraphView';
 import { AgenticRagView } from './components/AgenticRagView';
 import { AnalyticsView } from './components/AnalyticsView';
@@ -13,6 +12,11 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { NotificationSettings } from './components/NotificationSettings';
 import { ArchitectureDocsModal } from './components/ArchitectureDocsModal';
 import { GeminiLiveVoiceModal } from './components/GeminiLiveVoiceModal';
+import { ArrivalModal } from './components/ArrivalModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { AboutPage } from './pages/AboutPage';
+import { FAQPage } from './pages/FAQPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { LanguageProvider, useI18n } from './i18n';
 import { ThemeProvider } from './context/ThemeContext';
 import {
@@ -21,33 +25,28 @@ import {
   ADKWorkflowExecution,
   KnowledgeGraphData,
   LocationTag,
-  JournalAttachment
+  JournalAttachment,
+  NavigationTab
 } from './types';
 import {
   Plus,
   Sparkles,
   Calendar,
-  Tag,
-  Clock,
   Trash2,
-  Edit3,
-  BookOpen,
-  BrainCircuit,
-  MessageSquare,
-  AlertCircle
+  MapPin
 } from 'lucide-react';
 
 function MainAppContent() {
-  const { t, currentLanguage } = useI18n();
+  const { currentLanguage } = useI18n();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [journals, setJournals] = useState<JournalEntry[]>([]);
   const [selectedJournal, setSelectedJournal] = useState<JournalEntry | null>(null);
-  const [latestWorkflowExecution, setLatestWorkflowExecution] = useState<ADKWorkflowExecution | null>(null);
   const [knowledgeGraph, setKnowledgeGraph] = useState<KnowledgeGraphData | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'journal' | 'insights' | 'ask_history' | 'knowledge_graph' | 'admin'>('journal');
+  const [activeTab, setActiveTab] = useState<NavigationTab>('journal');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [initialEditorContent, setInitialEditorContent] = useState('');
 
   // Filters for History Pane
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
@@ -59,6 +58,7 @@ function MainAppContent() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showArchitectureDocs, setShowArchitectureDocs] = useState(false);
   const [showLiveVoiceModal, setShowLiveVoiceModal] = useState(false);
+  const [showArrivalModal, setShowArrivalModal] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -66,11 +66,10 @@ function MainAppContent() {
 
   const fetchInitialData = async () => {
     try {
-      const [resUser, resJournals, resGraph, resTraces] = await Promise.all([
+      const [resUser, resJournals, resGraph] = await Promise.all([
         fetch('/api/user/profile'),
         fetch('/api/journals'),
         fetch('/api/knowledge-graph'),
-        fetch('/api/adk/traces'),
       ]);
 
       if (resUser.ok) {
@@ -90,13 +89,6 @@ function MainAppContent() {
       if (resGraph.ok) {
         const graphData = await resGraph.json();
         setKnowledgeGraph(graphData.graph);
-      }
-
-      if (resTraces.ok) {
-        const tracesData = await resTraces.json();
-        if (tracesData.traces && tracesData.traces.length > 0) {
-          setLatestWorkflowExecution(tracesData.traces[0]);
-        }
       }
     } catch (err) {
       console.error('Failed to load initial data:', err);
@@ -129,14 +121,12 @@ function MainAppContent() {
         const newJournal: JournalEntry = data.journal;
         setJournals((prev) => [newJournal, ...prev.filter((j) => j.id !== newJournal.id)]);
         setSelectedJournal(newJournal);
-        if (data.workflowExecution) {
-          setLatestWorkflowExecution(data.workflowExecution);
-        }
         setIsCreatingNew(false);
+        setInitialEditorContent('');
         fetchKnowledgeGraph();
       }
     } catch (err) {
-      console.error('Error saving journal:', err);
+      console.error('Error saving reflection:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -154,46 +144,30 @@ function MainAppContent() {
         }
       }
     } catch (err) {
-      console.error('Delete journal error:', err);
-    }
-  };
-
-  const handleToggleAction = async (actionId: string, completed: boolean) => {
-    if (!selectedJournal) return;
-    try {
-      const res = await fetch(`/api/journals/${selectedJournal.id}/action-toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId, completed }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedJournal(data.journal);
-        setJournals((prev) => prev.map((j) => (j.id === data.journal.id ? data.journal : j)));
-      }
-    } catch (err) {
-      console.error('Action toggle failed:', err);
-    }
-  };
-
-  const handleUpdateSensitiveState = async (isSensitive: boolean, detoxMode: boolean) => {
-    if (!selectedJournal) return;
-    try {
-      const updated: JournalEntry = {
-        ...selectedJournal,
-        isSensitive,
-        detoxMode,
-      };
-      setSelectedJournal(updated);
-      setJournals((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
-    } catch (err) {
-      console.error('Failed to update sensitivity:', err);
+      console.error('Delete reflection error:', err);
     }
   };
 
   const handleUpdateJournal = (updated: JournalEntry) => {
     setSelectedJournal(updated);
     setJournals((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
+  };
+
+  const handleUpdateProfile = async (updates: Partial<UserProfile>) => {
+    if (!user) return;
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+    }
   };
 
   const handleSwitchRole = async (role: 'user' | 'admin') => {
@@ -237,17 +211,18 @@ function MainAppContent() {
       onOpenNotifications={() => setShowNotifications(true)}
       onOpenArchitectureDocs={() => setShowArchitectureDocs(true)}
       onOpenLiveVoice={() => setShowLiveVoiceModal(true)}
+      onOpenArrivalModal={() => setShowArrivalModal(true)}
       onSwitchRole={handleSwitchRole}
       onNewEntryClick={() => {
         setIsCreatingNew(true);
+        setInitialEditorContent('');
         setActiveTab('journal');
       }}
     >
-      {/* 1. JOURNAL TAB: 3-PANE LAYOUT */}
+      {/* 1. MY JOURNAL (3-PANE LAYOUT) */}
       {activeTab === 'journal' && (
         <div className="flex-1 flex flex-col lg:flex-row h-full overflow-hidden">
-          
-          {/* LEFT PANE: ENTRY HISTORY */}
+          {/* Left: Entry Timeline */}
           <EntryHistoryList
             entries={journals}
             selectedEntryId={selectedJournal?.id || null}
@@ -255,7 +230,10 @@ function MainAppContent() {
               setSelectedJournal(entry);
               setIsCreatingNew(false);
             }}
-            onNewEntry={() => setIsCreatingNew(true)}
+            onNewEntry={() => {
+              setIsCreatingNew(true);
+              setInitialEditorContent('');
+            }}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             moodFilter={moodFilter}
@@ -264,23 +242,24 @@ function MainAppContent() {
             setTagFilter={setTagFilter}
           />
 
-          {/* CENTER PANE: JOURNAL CANVAS & CONVERSATION */}
-          <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-3 sm:p-5 space-y-5">
+          {/* Center: Canvas & Insights */}
+          <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-4 sm:p-6 space-y-6">
             {isCreatingNew || !selectedJournal ? (
               <JournalEditor
+                initialContent={initialEditorContent}
                 onSaveAndAnalyze={handleSaveAndAnalyze}
                 isSubmitting={isSubmitting}
                 onOpenLiveVoice={() => setShowLiveVoiceModal(true)}
               />
             ) : (
-              <div className="space-y-5">
-                {/* Entry Header & Actions */}
-                <div className="panel-elevated rounded-2xl p-4 sm:p-5 space-y-3">
+              <div className="space-y-6 max-w-4xl mx-auto w-full">
+                {/* Active Entry Glass Card */}
+                <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-4 border border-white/40 dark:border-white/10 shadow-sm">
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-mono text-[var(--text-muted)] flex items-center space-x-1">
-                          <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span className="text-xs text-[var(--text-muted)] flex items-center space-x-1 font-medium">
+                          <Calendar className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
                           <span>
                             {new Date(selectedJournal.createdAt).toLocaleDateString(
                               currentLanguage === 'en' ? 'en-US' : currentLanguage,
@@ -289,12 +268,13 @@ function MainAppContent() {
                           </span>
                         </span>
                         {selectedJournal.location && (
-                          <span className="text-[11px] text-[var(--text-muted)] px-2 py-0.5 rounded bg-[var(--bg-secondary)] border border-[var(--border-subtle)]">
-                            📍 {selectedJournal.location.placeName}
+                          <span className="text-xs text-[var(--text-muted)] px-2.5 py-0.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-subtle)] flex items-center space-x-1">
+                            <MapPin className="h-3 w-3 text-teal-600 dark:text-teal-400" />
+                            <span>{selectedJournal.location.placeName}</span>
                           </span>
                         )}
                       </div>
-                      <h2 className="font-serif font-bold text-lg sm:text-xl text-[var(--text-primary)]">
+                      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                         {selectedJournal.title}
                       </h2>
                     </div>
@@ -302,58 +282,41 @@ function MainAppContent() {
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
-                        onClick={() => setIsCreatingNew(true)}
-                        aria-label="Write a new journal entry"
-                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-xs focus-ring min-h-[36px]"
+                        onClick={() => {
+                          setIsCreatingNew(true);
+                          setInitialEditorContent('');
+                        }}
+                        className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs focus-ring min-h-[38px]"
                       >
-                        <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{t.timeline?.newEntry || 'New Entry'}</span>
+                        <Plus className="h-4 w-4" />
+                        <span>New Reflection</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={(e) => handleDeleteJournal(selectedJournal.id, e)}
-                        aria-label={`Delete entry: ${selectedJournal.title}`}
-                        className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-rose-600 hover:border-rose-500/40 focus-ring min-h-[36px] min-w-[36px] flex items-center justify-center transition-colors"
+                        className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-rose-600 hover:border-rose-500/40 focus-ring min-h-[38px] min-w-[38px] flex items-center justify-center transition-colors"
                         title="Delete Entry"
                       >
-                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
 
-                  {/* Entry Body */}
-                  <div className="pt-2 border-t border-[var(--border-subtle)]">
-                    <p className="text-sm leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
+                  {/* Body Content with 16px+ legible typography */}
+                  <div className="pt-3 border-t border-[var(--border-subtle)]">
+                    <p className="text-base sm:text-lg leading-relaxed text-[var(--text-primary)] whitespace-pre-line">
                       {selectedJournal.content}
                     </p>
                   </div>
 
-                  {/* Attached Images */}
-                  {selectedJournal.attachments && selectedJournal.attachments.length > 0 && (
-                    <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-wrap gap-2">
-                      {selectedJournal.attachments.map((att) => (
-                        <div key={att.id} className="rounded-xl overflow-hidden border border-[var(--border-subtle)]">
-                          {att.dataUrl && (
-                            <img
-                              src={att.dataUrl}
-                              alt={`Attached visual: ${att.name}`}
-                              className="max-h-48 object-cover rounded-lg"
-                              referrerPolicy="no-referrer"
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   {/* Tags */}
                   {selectedJournal.tags && selectedJournal.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-2">
+                    <div className="flex flex-wrap gap-2 pt-2">
                       {selectedJournal.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2.5 py-0.5 rounded-lg bg-[var(--bg-secondary)] text-[11px] text-[var(--text-secondary)] font-medium border border-[var(--border-subtle)]"
+                          className="px-3 py-1 rounded-xl bg-[var(--bg-secondary)] text-xs text-[var(--text-secondary)] font-medium border border-[var(--border-subtle)]"
                         >
                           #{tag}
                         </span>
@@ -362,62 +325,57 @@ function MainAppContent() {
                   )}
                 </div>
 
-                {/* Gemini Socratic Reflection Card */}
+                {/* Friendly Coach Reflection Card */}
                 {selectedJournal.reflection && (
                   <ReflectionCard reflection={selectedJournal.reflection} />
                 )}
 
-                {/* Multi-turn Socratic Conversation Thread */}
+                {/* Multi-turn Empathetic Conversation Thread */}
                 <ConversationThread
                   journal={selectedJournal}
                   onUpdateJournal={handleUpdateJournal}
                 />
-
-                {/* ADK Multi-Agent Trace Viewer */}
-                {latestWorkflowExecution && (
-                  <AgentWorkflowInspector execution={latestWorkflowExecution} />
-                )}
               </div>
             )}
           </div>
 
-          {/* RIGHT PANE: INSIGHTS & REFLECTION COACH */}
+          {/* Right: Insights & Reflection Coach */}
           <RightInsightsPane
-            journals={journals}
             selectedJournal={selectedJournal}
-            onSelectTag={(tag) => {
-              setTagFilter(tag);
-              setActiveTab('journal');
+            onOpenLiveVoice={() => setShowLiveVoiceModal(true)}
+            onQuickPrompt={(prompt) => {
+              setIsCreatingNew(true);
+              setInitialEditorContent(`Reflecting on: "${prompt}"\n\n`);
             }}
-            onToggleAction={handleToggleAction}
-            onUpdateSensitiveState={handleUpdateSensitiveState}
           />
-
         </div>
       )}
 
-      {/* 2. INSIGHTS & TRENDS TAB */}
-      {activeTab === 'insights' && (
-        <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <AnalyticsView journals={journals} />
-        </div>
+      {/* 2. INSIGHTS & TRENDS */}
+      {activeTab === 'insights' && <AnalyticsView />}
+
+      {/* 3. DEEP REFLECTIONS (SEARCH HISTORY) */}
+      {activeTab === 'ask_history' && <AgenticRagView />}
+
+      {/* 4. JOURNEY MAP */}
+      {activeTab === 'knowledge_graph' && <KnowledgeGraphView graphData={knowledgeGraph} />}
+
+      {/* 5. ABOUT REFLECTLOGIXAI */}
+      {activeTab === 'about' && <AboutPage />}
+
+      {/* 6. FAQ & HELP */}
+      {activeTab === 'faq' && <FAQPage />}
+
+      {/* 7. SETTINGS & PREFERENCES */}
+      {activeTab === 'settings' && (
+        <SettingsPage
+          user={user}
+          onUpdateProfile={handleUpdateProfile}
+          onOpenNotifications={() => setShowNotifications(true)}
+        />
       )}
 
-      {/* 3. ASK MY HISTORY (RAG) TAB */}
-      {activeTab === 'ask_history' && (
-        <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <AgenticRagView journals={journals} />
-        </div>
-      )}
-
-      {/* 4. KNOWLEDGE GRAPH TAB */}
-      {activeTab === 'knowledge_graph' && (
-        <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <KnowledgeGraphView graphData={knowledgeGraph} onRefresh={fetchKnowledgeGraph} />
-        </div>
-      )}
-
-      {/* 5. ADMIN DASHBOARD TAB */}
+      {/* 8. SPACE SETTINGS (ADMIN) */}
       {activeTab === 'admin' && user?.role === 'admin' && (
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
           <AdminDashboard />
@@ -425,21 +383,46 @@ function MainAppContent() {
       )}
 
       {/* MODALS */}
+      <ArrivalModal
+        isOpen={showArrivalModal}
+        onClose={() => setShowArrivalModal(false)}
+        onSelectMood={(mood) => {
+          setMoodFilter(mood);
+        }}
+        onQuickStart={(initialText) => {
+          setShowArrivalModal(false);
+          setIsCreatingNew(true);
+          setInitialEditorContent(initialText || '');
+          setActiveTab('journal');
+        }}
+        onOpenVoice={() => setShowLiveVoiceModal(true)}
+        onViewInsights={() => setActiveTab('insights')}
+      />
+
       {showNotifications && (
-        <NotificationSettings onClose={() => setShowNotifications(false)} />
+        <NotificationSettings
+          isOpen={showNotifications}
+          onClose={() => setShowNotifications(false)}
+        />
       )}
 
       {showArchitectureDocs && (
-        <ArchitectureDocsModal onClose={() => setShowArchitectureDocs(false)} />
+        <ArchitectureDocsModal
+          isOpen={showArchitectureDocs}
+          onClose={() => setShowArchitectureDocs(false)}
+        />
       )}
 
       {showLiveVoiceModal && (
         <GeminiLiveVoiceModal
+          isOpen={showLiveVoiceModal}
           onClose={() => setShowLiveVoiceModal(false)}
-          onAppendJournalContent={(dictated) => {
-            if (dictated.trim()) {
+          onSaveVoiceEntry={async (_title, transcript) => {
+            if (transcript.trim()) {
               setIsCreatingNew(true);
+              setInitialEditorContent(`Voice Reflection:\n${transcript}\n\n`);
               setActiveTab('journal');
+              setShowLiveVoiceModal(false);
             }
           }}
         />
@@ -450,10 +433,12 @@ function MainAppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <MainAppContent />
-      </LanguageProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <LanguageProvider>
+          <MainAppContent />
+        </LanguageProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

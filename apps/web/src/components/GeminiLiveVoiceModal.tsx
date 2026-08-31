@@ -170,7 +170,7 @@ export const GeminiLiveVoiceModal: React.FC<GeminiLiveVoiceModalProps> = ({
 
     setTranscript((prev) => [...prev, userItem]);
     setIsProcessing(true);
-    setStatusMessage(t.voice.synthesizing);
+    setStatusMessage((t.voice as any)?.synthesizing || 'Reflecting with coach...');
 
     try {
       const response = await fetch('/api/chat/socratic-coach', {
@@ -477,7 +477,7 @@ export const GeminiLiveVoiceModal: React.FC<GeminiLiveVoiceModalProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-2.5 bg-stone-950/60 border-b border-stone-800/80 text-xs">
           <div className="flex items-center space-x-2">
             <Sliders className="h-3.5 w-3.5 text-amber-400" />
-            <span className="text-stone-400 font-mono text-[11px]">{t.voice.toneSelect}:</span>
+            <span className="text-stone-400 font-mono text-[11px]">{(t.voice as any)?.toneSelect || 'Tone'}:</span>
             <div className="flex items-center space-x-1 rounded-xl bg-stone-900/80 p-1 border border-stone-800">
               {(['socratic', 'empathetic', 'action-oriented', 'strategic'] as const).map((tone) => (
                 <button
@@ -639,7 +639,7 @@ export const GeminiLiveVoiceModal: React.FC<GeminiLiveVoiceModalProps> = ({
               className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-semibold text-stone-950 shadow-md hover:from-amber-400 hover:to-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
             >
               <FileText className="h-3.5 w-3.5 text-stone-950" />
-              <span>{t.voice.convertToJournal}</span>
+              <span>{(t.voice as any)?.convertToJournal || 'Convert to Journal Entry'}</span>
             </button>
           </div>
 

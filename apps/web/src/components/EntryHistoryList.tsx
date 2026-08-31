@@ -1,17 +1,13 @@
 import React from 'react';
 import {
   Search,
-  Filter,
   Calendar,
-  Tag,
-  Clock,
-  Sparkles,
   Smile,
   Heart,
   Zap,
   Coffee,
   AlertCircle,
-  HelpCircle,
+  Sparkles,
   Plus,
   Compass
 } from 'lucide-react';
@@ -45,28 +41,26 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
 }) => {
   const { t, currentLanguage } = useI18n();
 
-  // Mood Icon Helper with Accessible Labels
-  const getMoodIcon = (mood?: MoodType | string) => {
+  const getMoodBadge = (mood?: MoodType | string) => {
     switch (mood) {
       case 'Joyful':
       case 'Grateful':
       case 'Inspired':
-        return <Smile className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />;
+        return 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30';
       case 'Calm':
       case 'Reflective':
-        return <Coffee className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" aria-hidden="true" />;
+        return 'bg-teal-500/15 text-teal-700 dark:text-teal-300 border-teal-500/30';
       case 'Energized':
-        return <Zap className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" aria-hidden="true" />;
+        return 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30';
       case 'Anxious':
       case 'Overwhelmed':
       case 'Frustrated':
-        return <AlertCircle className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 shrink-0" aria-hidden="true" />;
+        return 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30';
       default:
-        return <Sparkles className="h-3.5 w-3.5 text-stone-500 shrink-0" aria-hidden="true" />;
+        return 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30';
     }
   };
 
-  // Group entries by day: Today, Yesterday, This Week, Earlier
   const now = Date.now();
   const oneDay = 86400000;
   const sevenDays = 7 * oneDay;
@@ -115,56 +109,53 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
 
   return (
     <section
-      aria-label="Journal entry history and filters"
-      className="flex flex-col h-full border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] w-full lg:w-80 xl:w-96 shrink-0"
+      aria-label="Journal reflections timeline and search"
+      className="flex flex-col h-full border-r border-[var(--border-subtle)] bg-[var(--bg-surface)]/60 backdrop-blur-md w-full lg:w-80 xl:w-96 shrink-0"
     >
-      {/* Header & New Entry CTA */}
-      <div className="p-3 sm:p-4 border-b border-[var(--border-subtle)] space-y-3">
+      {/* Header & Search */}
+      <div className="p-4 border-b border-[var(--border-subtle)] space-y-3.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-            <h2 className="font-serif font-bold text-sm text-[var(--text-primary)]">
-              {t.timeline?.title || 'Journal History'}
+            <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+            <h2 className="text-base font-bold text-[var(--text-primary)]">
+              Reflections Timeline
             </h2>
           </div>
-          <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-            {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'}
-          </span>
+          <button
+            type="button"
+            onClick={onNewEntry}
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs focus-ring"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>New Reflection</span>
+          </button>
         </div>
 
-        {/* Accessible Search Input */}
+        {/* High Contrast Search Input */}
         <div className="relative">
           <label htmlFor="entry-search-input" className="sr-only">
-            Search journal entries by title, keywords, or tags
+            Search reflections by title, thoughts, or tags
           </label>
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none"
-            aria-hidden="true"
-          />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
           <input
             id="entry-search-input"
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t.timeline?.searchPlaceholder || 'Search entries, feelings, tags...'}
-            className="w-full rounded-xl glass-input pl-9 pr-3 py-2 text-xs placeholder:text-[var(--text-muted)] focus-ring"
+            placeholder="Search thoughts, tags, themes..."
+            className="w-full rounded-xl glass-input pl-10 pr-3.5 py-2.5 text-sm placeholder:text-[var(--text-muted)] focus-ring"
           />
         </div>
 
-        {/* Filters: Mood & Tag */}
+        {/* Filters */}
         <div className="flex items-center gap-2">
-          {/* Mood Dropdown */}
           <div className="flex-1">
-            <label htmlFor="mood-filter-select" className="sr-only">
-              Filter by mood
-            </label>
             <select
-              id="mood-filter-select"
               value={moodFilter}
               onChange={(e) => setMoodFilter(e.target.value)}
-              className="w-full rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
+              className="w-full rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
             >
-              <option value="all">{t.timeline?.allMoods || 'All Moods'}</option>
+              <option value="all">All States</option>
               {availableMoods.filter((m) => m !== 'all').map((m) => (
                 <option key={m} value={m}>
                   {m}
@@ -173,18 +164,13 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
             </select>
           </div>
 
-          {/* Tag Dropdown */}
           <div className="flex-1">
-            <label htmlFor="tag-filter-select" className="sr-only">
-              Filter by tag
-            </label>
             <select
-              id="tag-filter-select"
               value={tagFilter}
               onChange={(e) => setTagFilter(e.target.value)}
-              className="w-full rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
+              className="w-full rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
             >
-              <option value="all">{t.timeline?.allTags || 'All Tags'}</option>
+              <option value="all">All Life Areas</option>
               {allTags.map((tg) => (
                 <option key={tg} value={tg}>
                   #{tg}
@@ -195,26 +181,16 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
         </div>
       </div>
 
-      {/* Grouped Entry History List (Semantic <ul role="list">) */}
-      <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-4">
+      {/* Entry Cards List */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {filteredEntries.length === 0 ? (
           <div className="text-center py-12 px-4 space-y-3">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] text-[var(--text-muted)]" aria-hidden="true">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] text-[var(--text-muted)]">
               <Calendar className="h-6 w-6" />
             </div>
-            <p className="text-xs text-[var(--text-muted)] font-medium">
-              {searchQuery || moodFilter !== 'all' || tagFilter !== 'all'
-                ? t.timeline?.noEntriesMatch || 'No journal entries match your search criteria.'
-                : t.timeline?.noEntriesFound || 'No journal entries yet. Write your first reflection!'}
+            <p className="text-sm text-[var(--text-muted)] font-medium">
+              No reflections found matching your criteria.
             </p>
-            <button
-              type="button"
-              onClick={onNewEntry}
-              className="inline-flex items-center space-x-1.5 rounded-xl bg-amber-500 text-stone-950 px-3 py-1.5 text-xs font-bold shadow-sm focus-ring"
-            >
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{t.timeline?.newEntry || 'Write New Entry'}</span>
-            </button>
           </div>
         ) : (
           (['today', 'yesterday', 'thisWeek', 'earlier'] as const).map((groupKey) => {
@@ -222,20 +198,20 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
             if (!groupList || groupList.length === 0) return null;
 
             const groupTitleMap = {
-              today: t.timeline?.todayGroup || 'Today',
-              yesterday: t.timeline?.yesterdayGroup || 'Yesterday',
-              thisWeek: t.timeline?.thisWeekGroup || 'This Week',
-              earlier: t.timeline?.earlierGroup || 'Earlier Reflections',
+              today: 'Today',
+              yesterday: 'Yesterday',
+              thisWeek: 'This Week',
+              earlier: 'Earlier Reflections',
             };
 
             return (
-              <div key={groupKey} className="space-y-1.5">
-                <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
+              <div key={groupKey} className="space-y-2">
+                <div className="px-2 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
                   <span>{groupTitleMap[groupKey]}</span>
-                  <span className="font-mono text-[10px]">{groupList.length}</span>
+                  <span>{groupList.length}</span>
                 </div>
 
-                <ul role="list" className="space-y-1.5" aria-label={`${groupTitleMap[groupKey]} entries`}>
+                <ul role="list" className="space-y-2">
                   {groupList.map((entry) => {
                     const isSelected = selectedEntryId === entry.id;
                     const dateFormatted = new Date(entry.createdAt).toLocaleDateString(
@@ -243,52 +219,56 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
                       { month: 'short', day: 'numeric' }
                     );
                     const mood = entry.reflection?.moodAnalysis.primaryMood || 'Reflective';
-                    const snippet = entry.content.slice(0, 110);
-                    const accessibleSummary = `Entry from ${dateFormatted}, mood: ${mood}. Title: ${entry.title}. Preview: ${snippet}`;
+                    const snippet = entry.content.slice(0, 95);
 
                     return (
                       <li key={entry.id} role="listitem">
-                        <button
-                          type="button"
+                        <div
+                          role="button"
+                          tabIndex={0}
                           onClick={() => onSelectEntry(entry)}
-                          aria-label={accessibleSummary}
-                          aria-current={isSelected ? 'true' : undefined}
-                          className={`w-full text-left p-3 rounded-xl transition-all focus-ring border min-h-[58px] ${
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectEntry(entry);
+                            }
+                          }}
+                          className={`w-full p-4 rounded-2xl glass-card transition-all text-left cursor-pointer border ${
                             isSelected
-                              ? 'bg-amber-500/15 border-amber-500/40 text-[var(--text-primary)] shadow-sm'
-                              : 'bg-[var(--bg-surface)] hover:bg-[var(--bg-secondary)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
+                              ? 'border-teal-500 bg-teal-500/10 shadow-md ring-1 ring-teal-500/30'
+                              : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-secondary)]/50'
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <div className="flex items-center space-x-1.5 truncate">
-                              {getMoodIcon(mood)}
-                              <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
-                                {entry.title}
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-mono text-[var(--text-muted)] shrink-0">
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${getMoodBadge(mood)}`}>
+                              {mood}
+                            </span>
+                            <span className="text-xs text-[var(--text-muted)] font-medium">
                               {dateFormatted}
                             </span>
                           </div>
 
-                          <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed mb-2">
-                            {snippet}
+                          <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] line-clamp-1">
+                            {entry.title}
+                          </h3>
+
+                          <p className="text-xs sm:text-sm text-[var(--text-secondary)] line-clamp-2 mt-1 leading-relaxed">
+                            {snippet}...
                           </p>
 
-                          <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
-                            <div className="flex items-center space-x-1">
-                              <span className="font-medium px-1.5 py-0.5 rounded bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
-                                {mood}
-                              </span>
-                              {entry.tags && entry.tags.length > 0 && (
-                                <span className="truncate max-w-[90px] text-[var(--text-muted)]">
-                                  #{entry.tags[0]}
+                          {entry.tags && entry.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-2.5">
+                              {entry.tags.slice(0, 3).map((tItem) => (
+                                <span
+                                  key={tItem}
+                                  className="text-[11px] px-2 py-0.5 rounded-md bg-[var(--bg-secondary)] text-[var(--text-muted)] font-medium"
+                                >
+                                  #{tItem}
                                 </span>
-                              )}
+                              ))}
                             </div>
-                            <span className="font-mono">{entry.wordCount} words</span>
-                          </div>
-                        </button>
+                          )}
+                        </div>
                       </li>
                     );
                   })}

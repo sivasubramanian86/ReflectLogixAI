@@ -75,8 +75,8 @@ export const ConversationThread: React.FC<ConversationThreadProps> = ({
             <MessageSquare className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="font-serif font-bold text-xs sm:text-sm text-[var(--text-primary)]">
-              {t.reflection?.dialogueTitle || 'Dialogue with ReflectLogix Coach'}
+            <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+              {(t.reflection as any)?.dialogueTitle || 'Empathetic Reflection Chat'}
             </h3>
             <p className="text-[10px] sm:text-[11px] text-[var(--text-muted)]">
               Multi-turn Socratic inquiry exploring themes, emotions, and mindful decisions

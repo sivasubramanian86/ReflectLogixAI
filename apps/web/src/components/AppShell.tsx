@@ -3,14 +3,13 @@ import {
   Sparkles,
   BookOpen,
   TrendingUp,
-  BrainCircuit,
+  Compass,
   Globe,
   ShieldCheck,
   Languages,
   Moon,
   Sun,
   Bell,
-  FileCode,
   Mic,
   Menu,
   X,
@@ -18,22 +17,25 @@ import {
   Check,
   ChevronDown,
   Calendar,
-  Filter,
+  Settings,
+  Heart,
+  HelpCircle,
   Plus
 } from 'lucide-react';
-import { UserProfile } from '../types';
+import { UserProfile, NavigationTab } from '../types';
 import { useI18n } from '../i18n';
 import { useTheme } from '../context/ThemeContext';
 
 interface AppShellProps {
   user: UserProfile | null;
-  activeTab: 'journal' | 'insights' | 'ask_history' | 'knowledge_graph' | 'admin';
-  setActiveTab: (tab: 'journal' | 'insights' | 'ask_history' | 'knowledge_graph' | 'admin') => void;
+  activeTab: NavigationTab;
+  setActiveTab: (tab: NavigationTab) => void;
   timeFilter: 'all' | 'today' | 'week' | 'month';
   setTimeFilter: (filter: 'all' | 'today' | 'week' | 'month') => void;
   onOpenNotifications: () => void;
   onOpenArchitectureDocs: () => void;
   onOpenLiveVoice: () => void;
+  onOpenArrivalModal: () => void;
   onSwitchRole: (role: 'user' | 'admin') => void;
   onNewEntryClick: () => void;
   children: React.ReactNode;
@@ -48,11 +50,12 @@ export const AppShell: React.FC<AppShellProps> = ({
   onOpenNotifications,
   onOpenArchitectureDocs,
   onOpenLiveVoice,
+  onOpenArrivalModal,
   onSwitchRole,
   onNewEntryClick,
   children,
 }) => {
-  const { t, currentLanguage, setLanguage, supportedLanguages, isRTL } = useI18n();
+  const { currentLanguage, setLanguage, supportedLanguages } = useI18n();
   const { theme, toggleTheme } = useTheme();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -61,12 +64,10 @@ export const AppShell: React.FC<AppShellProps> = ({
 
   const langMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const mobileDrawerRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const selectedLang = supportedLanguages.find((l) => l.code === currentLanguage) || supportedLanguages[0];
 
-  // Close menus on outside click
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
@@ -80,7 +81,6 @@ export const AppShell: React.FC<AppShellProps> = ({
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // Handle escape key and focus trap for mobile drawer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -99,31 +99,49 @@ export const AppShell: React.FC<AppShellProps> = ({
   const navItems = [
     {
       id: 'journal' as const,
-      label: t.nav.journal || 'Journal',
+      label: 'My Journal',
       icon: BookOpen,
       adminOnly: false,
     },
     {
       id: 'insights' as const,
-      label: t.nav.analytics || 'Insights & Trends',
+      label: 'Insights & Trends',
       icon: TrendingUp,
       adminOnly: false,
     },
     {
       id: 'ask_history' as const,
-      label: t.nav.agenticRag || 'Ask My History',
-      icon: BrainCircuit,
+      label: 'Deep Reflections',
+      icon: Compass,
       adminOnly: false,
     },
     {
       id: 'knowledge_graph' as const,
-      label: t.nav.knowledgeGraph || 'Knowledge Graph',
+      label: 'Journey Map',
       icon: Globe,
       adminOnly: false,
     },
     {
+      id: 'about' as const,
+      label: 'About ReflectLogixAI',
+      icon: Heart,
+      adminOnly: false,
+    },
+    {
+      id: 'faq' as const,
+      label: 'FAQ & Help',
+      icon: HelpCircle,
+      adminOnly: false,
+    },
+    {
+      id: 'settings' as const,
+      label: 'Settings',
+      icon: Settings,
+      adminOnly: false,
+    },
+    {
       id: 'admin' as const,
-      label: t.nav.admin || 'Admin Dashboard',
+      label: 'Space Settings',
       icon: ShieldCheck,
       adminOnly: true,
     },
@@ -144,51 +162,49 @@ export const AppShell: React.FC<AppShellProps> = ({
       {/* TOP APP BAR (role="banner") */}
       <header
         role="banner"
-        className="sticky top-0 z-40 w-full border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 backdrop-blur-md shadow-xs"
+        className="sticky top-0 z-40 w-full border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/85 backdrop-blur-xl shadow-xs"
       >
         <div className="w-full px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
-          
-          {/* Left: Brand Identity & Mobile Hamburger */}
+          {/* Left: Brand & Mobile Hamburger */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               ref={menuButtonRef}
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden inline-flex items-center justify-center p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] focus-ring min-w-[44px] min-h-[44px]"
-              aria-label={isMobileMenuOpen ? 'Close main navigation drawer' : 'Open main navigation drawer'}
+              aria-label={isMobileMenuOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
               aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-navigation-drawer"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
             <div className="flex items-center space-x-2.5">
               <div
-                className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 shadow-sm"
+                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500/15 border border-teal-500/30 text-teal-600 dark:text-teal-400 shadow-xs"
                 aria-hidden="true"
               >
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h1 className="font-serif font-bold text-base sm:text-lg tracking-tight text-[var(--text-primary)]">
-                    ReflectLogix<span className="text-amber-600 dark:text-amber-400">AI</span>
-                  </h1>
-                  <span className="hidden md:inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                    Gemini 2.5
+                  <span className="font-bold text-lg sm:text-xl tracking-tight text-[var(--text-primary)]">
+                    ReflectLogix<span className="text-teal-600 dark:text-teal-400">AI</span>
+                  </span>
+                  <span className="hidden sm:inline-flex items-center rounded-full bg-teal-500/10 px-2.5 py-0.5 text-xs font-semibold text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                    Clarity Companion
                   </span>
                 </div>
-                <p className="hidden sm:block text-[11px] text-[var(--text-muted)] font-medium">
-                  {t.appSubtitle || 'Your Multi-Purpose Personal Gemini Journal'}
+                <p className="hidden sm:block text-xs text-[var(--text-muted)] font-medium">
+                  Your Personal Life Reflection & Mindful Haven
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Center: Current Date & View Selectors (Only on Journal Tab) */}
+          {/* Center: Friendly View Switcher (Journal Tab) */}
           <div className="hidden md:flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] font-medium">
-              <Calendar className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+            <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] font-medium">
+              <Calendar className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" aria-hidden="true" />
               <span>{currentDateFormatted}</span>
             </div>
 
@@ -198,418 +214,274 @@ export const AppShell: React.FC<AppShellProps> = ({
                 aria-label="Filter journal entries by time period"
                 className="flex items-center rounded-xl bg-[var(--bg-secondary)] p-1 border border-[var(--border-subtle)]"
               >
-                {(['all', 'today', 'week', 'month'] as const).map((mode) => {
-                  const labelMap = {
-                    all: t.timeline?.allTime || 'All Time',
-                    today: t.timeline?.today || 'Today',
-                    week: t.timeline?.thisWeek || 'Week',
-                    month: t.timeline?.thisMonth || 'Month',
-                  };
-                  return (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => setTimeFilter(mode)}
-                      aria-pressed={timeFilter === mode}
-                      className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-colors focus-ring ${
-                        timeFilter === mode
-                          ? 'bg-[var(--bg-surface)] text-amber-700 dark:text-amber-300 shadow-xs border border-[var(--border-strong)]'
-                          : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {labelMap[mode]}
-                    </button>
-                  );
-                })}
+                {(['all', 'today', 'week', 'month'] as const).map((filterKey) => (
+                  <button
+                    key={filterKey}
+                    type="button"
+                    onClick={() => setTimeFilter(filterKey)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors focus-ring ${
+                      timeFilter === filterKey
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {filterKey === 'all' && 'All Entries'}
+                    {filterKey === 'today' && 'Today'}
+                    {filterKey === 'week' && 'This Week'}
+                    {filterKey === 'month' && 'This Month'}
+                  </button>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Right: Actions, Language Selector, Theme Switcher, Avatar */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2">
-            
-            {/* Live Voice Assistant Trigger */}
+          {/* Right: Actions, Language, Theme, Profile */}
+          <div className="flex items-center space-x-2 sm:space-x-2.5">
+            {/* Daily Arrival Check-in Button */}
             <button
               type="button"
-              onClick={onOpenLiveVoice}
-              aria-label="Start Live Voice Socratic Reflection with Gemini"
-              className="inline-flex items-center space-x-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 px-2.5 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 shadow-xs transition-colors focus-ring min-h-[38px]"
+              onClick={onOpenArrivalModal}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 border border-teal-500/30 text-xs sm:text-sm font-bold focus-ring min-h-[40px]"
+              aria-label="Open daily check-in"
             >
-              <Mic className="h-4 w-4 animate-pulse text-amber-600 dark:text-amber-400" aria-hidden="true" />
-              <span className="hidden xl:inline">{t.nav.liveVoice || 'Live Voice Coach'}</span>
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Daily Check-in</span>
             </button>
 
-            {/* Architecture Blueprint Modal Trigger */}
-            <button
-              type="button"
-              onClick={onOpenArchitectureDocs}
-              aria-label="View system architecture, zero-trust rules, and ADK pipeline blueprint"
-              className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] focus-ring min-w-[38px] min-h-[38px] flex items-center justify-center transition-colors"
-              title="Architecture & ADK Pipeline"
-            >
-              <FileCode className="h-4 w-4" aria-hidden="true" />
-            </button>
-
-            {/* Notifications & Webhooks */}
-            <button
-              type="button"
-              onClick={onOpenNotifications}
-              aria-label="Open notifications and webhook configuration"
-              className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] focus-ring min-w-[38px] min-h-[38px] flex items-center justify-center transition-colors"
-              title="Notifications"
-            >
-              <Bell className="h-4 w-4" aria-hidden="true" />
-            </button>
-
-            {/* Theme Toggle (Light / Dark) */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-              className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] focus-ring min-w-[38px] min-h-[38px] flex items-center justify-center transition-colors"
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-4 w-4 text-amber-400" aria-hidden="true" />
-              ) : (
-                <Moon className="h-4 w-4 text-stone-700" aria-hidden="true" />
-              )}
-            </button>
-
-            {/* Language Selector Dropdown */}
+            {/* Language Dropdown Menu */}
             <div className="relative" ref={langMenuRef}>
               <button
                 type="button"
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                aria-label={`Current language: ${selectedLang.name}. Open language menu`}
+                className="flex items-center space-x-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-ring min-h-[40px]"
+                aria-label={`Language selector. Current: ${selectedLang.name}`}
                 aria-expanded={isLangMenuOpen}
-                aria-haspopup="listbox"
-                className="flex items-center space-x-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)] px-2.5 py-1.5 text-xs font-medium text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-ring min-h-[38px]"
               >
-                <span className="text-sm" aria-hidden="true">{selectedLang.flag}</span>
-                <span className="hidden sm:inline">{selectedLang.nativeName}</span>
-                <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" aria-hidden="true" />
+                <Languages className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                <span className="hidden md:inline">{selectedLang.name}</span>
+                <ChevronDown className="h-3 w-3 opacity-60" />
               </button>
 
               {isLangMenuOpen && (
-                <div
-                  role="listbox"
-                  aria-label="Select language"
-                  className="absolute right-0 mt-2 z-50 w-64 panel-elevated rounded-xl shadow-2xl p-1.5 max-h-96 overflow-y-auto"
-                >
-                  <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-subtle)]">
-                    Supported Languages (18)
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl glass-card border border-white/40 dark:border-white/10 shadow-2xl p-1.5 z-50 max-h-72 overflow-y-auto">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-subtle)] mb-1">
+                    Select Language (18+ supported)
                   </div>
-
-                  {/* Indian Regional Languages */}
-                  <div className="px-2 pt-2 pb-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                    Indian Languages
-                  </div>
-                  {supportedLanguages
-                    .filter((l) => l.region === 'India')
-                    .map((lang) => (
-                      <button
-                        key={lang.code}
-                        role="option"
-                        aria-selected={currentLanguage === lang.code}
-                        onClick={() => {
-                          setLanguage(lang.code);
-                          setIsLangMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors focus-ring ${
-                          currentLanguage === lang.code
-                            ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold'
-                            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm" aria-hidden="true">{lang.flag}</span>
-                          <span>{lang.nativeName}</span>
-                          <span className="text-[10px] text-[var(--text-muted)]">({lang.name})</span>
-                        </div>
-                        {currentLanguage === lang.code && (
-                          <Check className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-                        )}
-                      </button>
-                    ))}
-
-                  {/* Global Languages */}
-                  <div className="px-2 pt-2.5 pb-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 border-t border-[var(--border-subtle)] mt-1">
-                    Global Languages
-                  </div>
-                  {supportedLanguages
-                    .filter((l) => l.region === 'Global')
-                    .map((lang) => (
-                      <button
-                        key={lang.code}
-                        role="option"
-                        aria-selected={currentLanguage === lang.code}
-                        onClick={() => {
-                          setLanguage(lang.code);
-                          setIsLangMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors focus-ring ${
-                          currentLanguage === lang.code
-                            ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold'
-                            : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm" aria-hidden="true">{lang.flag}</span>
-                          <span>{lang.nativeName}</span>
-                          <span className="text-[10px] text-[var(--text-muted)]">({lang.name})</span>
-                        </div>
-                        {currentLanguage === lang.code && (
-                          <Check className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-                        )}
-                      </button>
-                    ))}
+                  {supportedLanguages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(lang.code as any);
+                        setIsLangMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-colors ${
+                        currentLanguage === lang.code
+                          ? 'bg-teal-600 text-white font-bold'
+                          : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
+                      }`}
+                    >
+                      <span>{lang.name} ({lang.nativeName})</span>
+                      {currentLanguage === lang.code && <Check className="h-3.5 w-3.5" />}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* User Profile & Role Switcher */}
+            {/* Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-ring min-w-[40px] min-h-[40px] flex items-center justify-center"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4 text-amber-400" />
+              ) : (
+                <Moon className="h-4 w-4 text-slate-700" />
+              )}
+            </button>
+
+            {/* Settings Quick Icon */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('settings')}
+              className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] focus-ring min-w-[40px] min-h-[40px] flex items-center justify-center"
+              aria-label="Open Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+
+            {/* User Profile Menu */}
             <div className="relative" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                aria-label={`User menu: ${user?.displayName || 'Demo User'}, Role: ${user?.role || 'user'}`}
+                className="flex items-center space-x-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1.5 hover:border-[var(--border-strong)] focus-ring min-h-[40px]"
+                aria-label="User profile menu"
                 aria-expanded={isUserMenuOpen}
-                aria-haspopup="menu"
-                className="flex items-center space-x-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)] p-1.5 hover:border-[var(--border-strong)] focus-ring min-h-[38px]"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-xs" aria-hidden="true">
-                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                <div className="h-7 w-7 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'S'}
                 </div>
-                <div className="hidden lg:block text-left pr-1">
-                  <div className="text-xs font-semibold text-[var(--text-primary)] truncate max-w-[100px]">
-                    {user?.displayName?.split(' ')[0] || 'User'}
-                  </div>
-                  <div className="text-[10px] text-[var(--text-muted)] capitalize">
-                    {user?.role === 'admin' ? 'Admin' : 'Standard'}
-                  </div>
-                </div>
+                <ChevronDown className="h-3 w-3 text-[var(--text-muted)]" />
               </button>
 
               {isUserMenuOpen && (
-                <div
-                  role="menu"
-                  aria-label="User account actions"
-                  className="absolute right-0 mt-2 z-50 w-56 panel-elevated rounded-xl shadow-2xl p-2"
-                >
-                  <div className="px-2 py-1.5 border-b border-[var(--border-subtle)] mb-1">
-                    <div className="font-semibold text-xs text-[var(--text-primary)]">
-                      {user?.displayName || 'Kailasam Siva'}
-                    </div>
-                    <div className="text-[11px] text-[var(--text-muted)] truncate">
-                      {user?.email || 'kailasamsiva@gmail.com'}
-                    </div>
-                  </div>
-
-                  <div className="px-2 py-1 text-[10px] font-semibold text-[var(--text-muted)] uppercase">
-                    RBAC Role Switching
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl glass-card border border-white/40 dark:border-white/10 shadow-2xl p-2 z-50 space-y-1">
+                  <div className="p-2.5 border-b border-[var(--border-subtle)]">
+                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">
+                      {user?.displayName || 'Reflective User'}
+                    </p>
+                    <p className="text-[11px] text-[var(--text-muted)] truncate">
+                      {user?.email || 'siva@example.com'}
+                    </p>
+                    <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md bg-teal-500/10 text-[10px] font-bold text-teal-700 dark:text-teal-300">
+                      {user?.role === 'admin' ? 'Workspace Admin' : 'Personal Journaler'}
+                    </span>
                   </div>
 
                   <button
                     type="button"
-                    role="menuitem"
                     onClick={() => {
-                      onSwitchRole('user');
+                      onSwitchRole(user?.role === 'admin' ? 'user' : 'admin');
                       setIsUserMenuOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                      user?.role === 'user'
-                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 font-semibold'
-                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
-                    }`}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
                   >
-                    <span>Standard User</span>
-                    {user?.role === 'user' && <Check className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />}
+                    <span>Switch to {user?.role === 'admin' ? 'Personal User' : 'Admin View'}</span>
                   </button>
 
                   <button
                     type="button"
-                    role="menuitem"
                     onClick={() => {
-                      onSwitchRole('admin');
+                      setActiveTab('settings');
                       setIsUserMenuOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
-                      user?.role === 'admin'
-                        ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 font-semibold'
-                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
-                    }`}
+                    className="w-full flex items-center space-x-2 p-2 rounded-xl text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
                   >
-                    <span className="flex items-center space-x-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-rose-500" aria-hidden="true" />
-                      <span>Admin Role</span>
-                    </span>
-                    {user?.role === 'admin' && <Check className="h-3.5 w-3.5 text-rose-500" aria-hidden="true" />}
+                    <Settings className="h-3.5 w-3.5" />
+                    <span>Preferences & Settings</span>
                   </button>
                 </div>
               )}
             </div>
-
           </div>
-
         </div>
       </header>
 
-      {/* BODY WITH LEFT SIDEBAR (role="navigation") + MAIN CONTENT (role="main") */}
-      <div className="flex-1 flex flex-row overflow-hidden relative">
-        
-        {/* DESKTOP LEFT SIDEBAR (role="navigation") */}
+      {/* BODY SHELL: SIDEBAR NAVIGATION + MAIN CONTENT */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Desktop Sidebar Navigation (role="navigation") */}
         <nav
           role="navigation"
-          aria-label="Primary application navigation"
-          className="hidden lg:flex flex-col w-56 xl:w-64 border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 space-y-4 shrink-0"
+          aria-label="Main sidebar navigation"
+          className="hidden lg:flex flex-col w-64 border-r border-[var(--border-subtle)] bg-[var(--bg-surface)]/60 backdrop-blur-md p-4 space-y-6 shrink-0"
         >
-          {/* Quick Action: New Journal Entry */}
+          {/* Quick New Reflection Button */}
           <button
             type="button"
             onClick={onNewEntryClick}
-            aria-label="Write a new journal entry"
-            className="flex items-center justify-center space-x-2 w-full rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold px-3 py-2.5 text-xs shadow-md transition-all active:scale-98 focus-ring min-h-[44px]"
+            className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-all hover:scale-[1.01] focus-ring min-h-[46px]"
           >
-            <Plus className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-            <span>{t.timeline?.newEntry || 'Write New Entry'}</span>
+            <Plus className="h-4 w-4" />
+            <span>New Reflection</span>
           </button>
 
           {/* Navigation Links */}
-          <div className="space-y-1">
-            <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-              Navigation
-            </div>
-            {navItems
-              .filter((item) => !item.adminOnly || user?.role === 'admin')
-              .map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
+          <ul role="list" className="space-y-1 flex-1">
+            {navItems.map((item) => {
+              if (item.adminOnly && user?.role !== 'admin') return null;
+              const isActive = activeTab === item.id;
+              const Icon = item.icon;
+
+              return (
+                <li key={item.id}>
                   <button
-                    key={item.id}
                     type="button"
                     onClick={() => setActiveTab(item.id)}
                     aria-current={isActive ? 'page' : undefined}
-                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all focus-ring min-h-[44px] ${
+                    className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all focus-ring ${
                       isActive
-                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-xs'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--text-muted)]'}`} aria-hidden="true" />
+                    <Icon className="h-4 w-4 shrink-0" />
                     <span>{item.label}</span>
                   </button>
-                );
-              })}
-          </div>
+                </li>
+              );
+            })}
+          </ul>
 
-          {/* System Status / Privacy Notice */}
-          <div className="mt-auto pt-3 border-t border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] space-y-1">
-            <div className="flex items-center space-x-1.5 text-emerald-700 dark:text-emerald-400 font-medium">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              <span>Multi-Tenant Cloud Run</span>
-            </div>
-            <p className="text-[10px] text-[var(--text-muted)] leading-tight">
-              Zero-knowledge client encryption & tenant isolation active.
-            </p>
+          {/* Sidebar Footer */}
+          <div className="pt-3 border-t border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] space-y-1">
+            <p className="font-semibold text-[var(--text-secondary)]">ReflectLogixAI v3.1</p>
+            <p>Private & Secure Sanctuary</p>
           </div>
         </nav>
 
-        {/* MOBILE DRAWER NAVIGATION (role="dialog" with focus trap and aria-modal) */}
+        {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
           <div
-            id="mobile-navigation-drawer"
             role="dialog"
             aria-modal="true"
-            aria-label="Main Navigation Menu"
-            ref={mobileDrawerRef}
             className="fixed inset-0 z-50 lg:hidden flex"
           >
-            {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+              className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm"
               onClick={() => setIsMobileMenuOpen(false)}
-              aria-hidden="true"
             />
-
-            {/* Drawer Content */}
-            <div className="relative flex flex-col w-72 max-w-[85vw] bg-[var(--bg-surface)] border-r border-[var(--border-strong)] p-4 shadow-2xl z-10">
-              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="h-5 w-5 text-amber-500" aria-hidden="true" />
-                  <span className="font-serif font-bold text-sm text-[var(--text-primary)]">ReflectLogixAI</span>
-                </div>
+            <div className="relative flex flex-col w-72 max-w-[80vw] h-full bg-[var(--bg-surface)] p-5 space-y-5 border-r border-[var(--border-subtle)] shadow-2xl z-10">
+              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+                <span className="font-bold text-base text-[var(--text-primary)]">Navigation</span>
                 <button
                   type="button"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  aria-label="Close navigation drawer"
-                  className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] focus-ring min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 >
-                  <X className="h-5 w-5" aria-hidden="true" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="my-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onNewEntryClick();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex items-center justify-center space-x-2 w-full rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold px-3 py-2.5 text-xs shadow-md focus-ring min-h-[44px]"
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  <span>{t.timeline?.newEntry || 'Write New Entry'}</span>
-                </button>
-              </div>
+              <ul role="list" className="space-y-1.5 flex-1 overflow-y-auto">
+                {navItems.map((item) => {
+                  if (item.adminOnly && user?.role !== 'admin') return null;
+                  const isActive = activeTab === item.id;
+                  const Icon = item.icon;
 
-              <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="Mobile Drawer Navigation">
-                {navItems
-                  .filter((item) => !item.adminOnly || user?.role === 'admin')
-                  .map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeTab === item.id;
-                    return (
+                  return (
+                    <li key={item.id}>
                       <button
-                        key={item.id}
                         type="button"
                         onClick={() => {
                           setActiveTab(item.id);
                           setIsMobileMenuOpen(false);
                         }}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all focus-ring min-h-[44px] ${
+                        className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition-colors ${
                           isActive
-                            ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-xs'
+                            ? 'bg-teal-600 text-white font-bold'
                             : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
                         }`}
                       >
-                        <Icon className={`h-4 w-4 ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--text-muted)]'}`} aria-hidden="true" />
+                        <Icon className="h-5 w-5" />
                         <span>{item.label}</span>
                       </button>
-                    );
-                  })}
-              </nav>
-
-              <div className="pt-3 border-t border-[var(--border-subtle)] text-xs text-[var(--text-muted)]">
-                <p>ReflectLogixAI v3.1</p>
-                <p className="text-[10px]">Cloud Run • Zero Trust</p>
-              </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
         )}
 
-        {/* MAIN CONTENT REGION (role="main") */}
-        <main
-          id="main-content"
-          role="main"
-          className="flex-1 flex flex-col overflow-y-auto focus:outline-none"
-          tabIndex={-1}
-        >
+        {/* MAIN APPLICATION CONTENT (role="main") */}
+        <main id="main-content" role="main" className="flex-1 flex overflow-hidden">
           {children}
         </main>
-
       </div>
     </div>
   );

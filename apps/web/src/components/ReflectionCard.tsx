@@ -3,19 +3,15 @@ import {
   Sparkles,
   Compass,
   HelpCircle,
-  ShieldAlert,
-  Flame,
-  Languages,
   CheckCircle2,
   Heart,
   TrendingUp,
-  BrainCircuit,
   Smile,
-  Zap,
-  Coffee,
-  AlertCircle
+  Lightbulb,
+  ArrowRight,
+  Globe
 } from 'lucide-react';
-import { ReflectionInsight } from '../types';
+import { ReflectionInsight, BilingualSummary } from '../types';
 import { useI18n } from '../i18n';
 
 interface ReflectionCardProps {
@@ -23,11 +19,10 @@ interface ReflectionCardProps {
 }
 
 export const ReflectionCard: React.FC<ReflectionCardProps> = ({ reflection }) => {
-  const { t, currentLanguage } = useI18n();
+  const { t } = useI18n();
   const [bilingualTab, setBilingualTab] = useState<'bilingual' | 'english'>('bilingual');
-  const { summary, bilingualSummary, moodAnalysis, cognitiveStrengths, reframeSuggestions, socraticQuestions, keyThemes } = reflection;
+  const { summary, bilingualSummary, moodAnalysis, cognitiveStrengths, reframeSuggestions, socraticQuestions } = reflection;
 
-  // Mood badge styling with high-contrast accessible borders
   const getMoodBadge = (mood: string) => {
     switch (mood) {
       case 'Joyful':
@@ -36,7 +31,7 @@ export const ReflectionCard: React.FC<ReflectionCardProps> = ({ reflection }) =>
         return 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30';
       case 'Calm':
       case 'Reflective':
-        return 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border-cyan-500/30';
+        return 'bg-teal-500/15 text-teal-800 dark:text-teal-300 border-teal-500/30';
       case 'Energized':
         return 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30';
       case 'Overwhelmed':
@@ -48,155 +43,210 @@ export const ReflectionCard: React.FC<ReflectionCardProps> = ({ reflection }) =>
     }
   };
 
+  const renderSummaryContent = () => {
+    if (bilingualSummary && typeof bilingualSummary === 'object') {
+      const bSummary = bilingualSummary as BilingualSummary;
+      if (bilingualTab === 'bilingual') {
+        return (
+          <div className="space-y-3">
+            {bSummary.originalSummary && (
+              <div>
+                <span className="text-[11px] font-bold text-teal-700 dark:text-teal-400 uppercase tracking-wider block mb-1">
+                  {bSummary.detectedLanguage ? `${bSummary.detectedLanguage} Reflection` : 'Native Reflection'}
+                </span>
+                <p className="text-base sm:text-lg text-[var(--text-primary)] leading-relaxed font-normal">
+                  {bSummary.originalSummary}
+                </p>
+              </div>
+            )}
+            {bSummary.englishSummary && bSummary.englishSummary !== bSummary.originalSummary && (
+              <div className="pt-2 border-t border-[var(--border-subtle)]">
+                <span className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">
+                  English Reflection
+                </span>
+                <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed italic">
+                  {bSummary.englishSummary}
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      } else {
+        return (
+          <p className="text-base sm:text-lg text-[var(--text-primary)] leading-relaxed font-normal">
+            {bSummary.englishSummary || bSummary.originalSummary || (typeof summary === 'string' ? summary : '')}
+          </p>
+        );
+      }
+    }
+
+    if (typeof summary === 'string') {
+      return (
+        <p className="text-base sm:text-lg text-[var(--text-primary)] leading-relaxed font-normal">
+          {summary}
+        </p>
+      );
+    }
+
+    if (summary && typeof summary === 'object') {
+      const sObj = summary as any;
+      return (
+        <p className="text-base sm:text-lg text-[var(--text-primary)] leading-relaxed font-normal">
+          {sObj.originalSummary || sObj.englishSummary || JSON.stringify(sObj)}
+        </p>
+      );
+    }
+
+    return null;
+  };
+
   return (
-    <div className="panel-elevated rounded-2xl p-4 sm:p-6 space-y-5 border border-[var(--border-subtle)] relative">
-      
-      {/* Header & Affect Gauge */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] pb-3">
-        <div className="flex items-center space-x-2.5">
+    <div className="glass-card rounded-2xl p-5 sm:p-7 space-y-6 border border-white/40 dark:border-white/10 shadow-sm relative">
+      {/* Header & Emotional Gauge */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border-subtle)] pb-4">
+        <div className="flex items-center space-x-3">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30 shadow-xs"
             aria-hidden="true"
           >
-            <BrainCircuit className="h-4 w-4" />
+            <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-serif text-sm font-bold text-[var(--text-primary)]">
-              {t.reflection?.title || 'Gemini Cognitive Reflection & Socratic Analysis'}
+            <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+              Reflection & Coach Insights
             </h3>
-            <p className="text-[11px] text-[var(--text-muted)]">
-              {t.reflection?.agentOrchestrated || 'ADK Orchestrated • Socratic Agent • Cognitive Reframer'}
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] font-medium">
+              Thoughtful perspectives & gentle guidance for your day
             </p>
           </div>
         </div>
 
         {/* Mood & Stress Indicators */}
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Emotional affect and stress score">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Emotional affect and stress level">
           <span
-            className={`rounded-xl px-2.5 py-1 text-xs font-semibold border ${getMoodBadge(moodAnalysis.primaryMood)}`}
-            aria-label={`Primary mood: ${moodAnalysis.primaryMood}`}
+            className={`rounded-xl px-3 py-1 text-xs sm:text-sm font-semibold border ${getMoodBadge(moodAnalysis.primaryMood)}`}
+            aria-label={`Primary state: ${moodAnalysis.primaryMood}`}
           >
             {moodAnalysis.primaryMood}
           </span>
           {moodAnalysis.secondaryMood && (
             <span
-              className={`rounded-xl px-2 py-0.5 text-xs border ${getMoodBadge(moodAnalysis.secondaryMood)}`}
-              aria-label={`Secondary mood: ${moodAnalysis.secondaryMood}`}
+              className={`rounded-xl px-2.5 py-1 text-xs border ${getMoodBadge(moodAnalysis.secondaryMood)}`}
+              aria-label={`Secondary state: ${moodAnalysis.secondaryMood}`}
             >
               {moodAnalysis.secondaryMood}
             </span>
           )}
           <span
-            className={`rounded-xl px-2.5 py-1 text-xs font-mono font-medium border ${
+            className={`rounded-xl px-3 py-1 text-xs sm:text-sm font-medium border ${
               moodAnalysis.stressLevel >= 7
-                ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30'
-                : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-subtle)]'
+                ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30 font-semibold'
+                : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
             }`}
             aria-label={`Stress score: ${moodAnalysis.stressLevel} out of 10`}
           >
-            {t.reflection?.stressScore || 'Stress Score'}: {moodAnalysis.stressLevel}/10
+            Ease Level: {10 - moodAnalysis.stressLevel}/10
           </span>
         </div>
       </div>
 
-      {/* Summary with Bilingual Adaptation */}
-      <div className="space-y-2">
-        {bilingualSummary && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium">
-              <Languages className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Language: {bilingualSummary.detectedLanguage}</span>
-            </div>
-            <div className="flex rounded-xl bg-[var(--bg-secondary)] p-0.5 border border-[var(--border-subtle)] text-[11px]">
-              <button
-                type="button"
-                onClick={() => setBilingualTab('bilingual')}
-                className={`px-2.5 py-0.5 rounded-lg transition-all focus-ring ${
-                  bilingualTab === 'bilingual'
-                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-strong)]'
-                    : 'text-[var(--text-muted)]'
-                }`}
-              >
-                Vernacular Summary
-              </button>
-              <button
-                type="button"
-                onClick={() => setBilingualTab('english')}
-                className={`px-2.5 py-0.5 rounded-lg transition-all focus-ring ${
-                  bilingualTab === 'english'
-                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-strong)]'
-                    : 'text-[var(--text-muted)]'
-                }`}
-              >
-                English
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="rounded-xl bg-[var(--bg-secondary)] p-3.5 border border-[var(--border-subtle)]">
-          <p className="text-xs sm:text-sm text-[var(--text-primary)] leading-relaxed">
-            {bilingualTab === 'bilingual' && bilingualSummary
-              ? bilingualSummary.vernacularSummary
-              : summary}
-          </p>
+      {/* Bilingual / Original Toggle */}
+      {bilingualSummary && (
+        <div className="flex items-center space-x-2 border-b border-[var(--border-subtle)] pb-2">
+          <button
+            type="button"
+            onClick={() => setBilingualTab('bilingual')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors focus-ring ${
+              bilingualTab === 'bilingual'
+                ? 'bg-teal-600 text-white'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Native & English
+          </button>
+          <button
+            type="button"
+            onClick={() => setBilingualTab('english')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors focus-ring ${
+              bilingualTab === 'english'
+                ? 'bg-teal-600 text-white'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            English Summary
+          </button>
         </div>
+      )}
+
+      {/* Summary Narrative */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] space-y-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
+          Clarity & Essence
+        </span>
+        {renderSummaryContent()}
       </div>
 
-      {/* Cognitive Strengths & Key Themes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Cognitive Strengths */}
-        <div className="rounded-xl bg-[var(--bg-secondary)] p-3 border border-[var(--border-subtle)] space-y-1.5">
-          <div className="flex items-center space-x-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-            <Heart className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t.reflection?.cognitiveStrengths || 'Observed Cognitive Strengths'}</span>
+      {/* Cognitive Strengths */}
+      {cognitiveStrengths && cognitiveStrengths.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm sm:text-base">
+            <Heart className="h-4 w-4" />
+            <span>Recognized Strengths & Resilience</span>
           </div>
-          <ul role="list" className="space-y-1" aria-label="Observed cognitive strengths">
-            {cognitiveStrengths.map((str, i) => (
-              <li key={i} role="listitem" className="text-xs text-[var(--text-secondary)] flex items-start space-x-1.5">
-                <span className="text-emerald-500 mt-0.5">•</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {cognitiveStrengths.map((str, idx) => (
+              <div
+                key={idx}
+                className="flex items-start space-x-2.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-[var(--text-primary)]"
+              >
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <span>{str}</span>
-              </li>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        {/* Cognitive Reframe */}
-        <div className="rounded-xl bg-[var(--bg-secondary)] p-3 border border-[var(--border-subtle)] space-y-1.5">
-          <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t.reflection?.reframeTitle || 'Constructive Reframe'}</span>
           </div>
-          <ul role="list" className="space-y-1" aria-label="Constructive cognitive reframes">
-            {reframeSuggestions.map((ref, i) => (
-              <li key={i} role="listitem" className="text-xs text-[var(--text-secondary)] flex items-start space-x-1.5">
-                <span className="text-amber-500 mt-0.5">•</span>
-                <span>{ref}</span>
-              </li>
+        </div>
+      )}
+
+      {/* Coach Inquiries */}
+      {socraticQuestions && socraticQuestions.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2 text-teal-700 dark:text-teal-400 font-bold text-sm sm:text-base">
+            <HelpCircle className="h-4 w-4" />
+            <span>Thoughtful Inquiries for You</span>
+          </div>
+          <div className="space-y-2">
+            {socraticQuestions.map((q, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-sm sm:text-base text-[var(--text-secondary)] italic leading-relaxed"
+              >
+                "{q}"
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Socratic Inquiries */}
-      <div className="space-y-2">
-        <div className="flex items-center space-x-1.5 text-xs font-bold text-cyan-700 dark:text-cyan-400">
-          <Compass className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>{t.reflection?.socraticTitle || 'Socratic Inquiries for Self-Reflection'}</span>
+      {/* Reframes & Micro-Actions */}
+      {reframeSuggestions && reframeSuggestions.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2 text-amber-700 dark:text-amber-400 font-bold text-sm sm:text-base">
+            <Lightbulb className="h-4 w-4" />
+            <span>Supportive Micro-Steps & Reframes</span>
+          </div>
+          <div className="space-y-2">
+            {reframeSuggestions.map((sug, idx) => (
+              <div
+                key={idx}
+                className="flex items-start space-x-2.5 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm sm:text-base text-[var(--text-primary)]"
+              >
+                <ArrowRight className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-1" />
+                <span>{sug}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <ul role="list" className="grid grid-cols-1 sm:grid-cols-2 gap-2" aria-label="Socratic reflection questions">
-          {socraticQuestions.map((q, idx) => (
-            <li
-              key={idx}
-              role="listitem"
-              className="rounded-xl bg-[var(--bg-secondary)] p-3 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] italic leading-relaxed"
-            >
-              "{q}"
-            </li>
-          ))}
-        </ul>
-      </div>
-
+      )}
     </div>
   );
 };

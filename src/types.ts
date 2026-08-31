@@ -5,6 +5,16 @@
 
 export type UserRole = 'user' | 'admin';
 
+export type NavigationTab =
+  | 'journal'
+  | 'insights'
+  | 'ask_history'
+  | 'knowledge_graph'
+  | 'about'
+  | 'faq'
+  | 'settings'
+  | 'admin';
+
 export interface UserProfile {
   userId: string;
   email: string;
@@ -167,9 +177,10 @@ export interface ADKWorkflowExecution {
 export interface GraphNode {
   id: string;
   label: string;
-  type: 'Topic' | 'Goal' | 'Emotion' | 'Person' | 'Habit' | 'Location';
-  weight: number; // frequency or importance
-  sentiment: 'positive' | 'neutral' | 'negative';
+  type: 'Topic' | 'Goal' | 'Emotion' | 'Person' | 'Habit' | 'Location' | 'Value' | string;
+  weight?: number; // frequency or importance
+  connections?: number;
+  sentiment?: 'positive' | 'neutral' | 'negative' | 'Grateful' | 'Inspired' | 'Calm' | 'Reflective' | 'Restful' | string;
 }
 
 export interface GraphEdge {
