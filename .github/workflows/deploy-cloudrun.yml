@@ -1,13 +1,25 @@
 name: Deploy to Google Cloud Run
 
 on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Google Cloud Region'
+        required: true
+        default: 'asia-southeast1'
   push:
     branches: [ main ]
-  workflow_dispatch:
+    paths:
+      - 'apps/**'
+      - 'infra/**'
+      - 'Dockerfile'
+      - 'server.ts'
+      - '.github/workflows/deploy-cloudrun.yml'
 
 jobs:
   deploy:
     name: Build & Deploy Cloud Run Service
+    if: "${{ secrets.WIF_PROVIDER != '' || github.event_name == 'workflow_dispatch' }}"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,21 +29,24 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
+        if: "${{ secrets.WIF_PROVIDER != '' }}"
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/898481937082/locations/global/workloadIdentityPools/github/providers/my-repo
-          service_account: reflectlogixai-deployer@reflectlogixai.iam.gserviceaccount.com
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
+        if: "${{ secrets.WIF_PROVIDER != '' }}"
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 460.0.0'
 
       - name: Deploy ReflectLogixAI to Cloud Run
+        if: "${{ secrets.WIF_PROVIDER != '' }}"
         run: |
           gcloud run deploy reflectlogixai-journal \
             --source . \
-            --region asia-southeast1 \
+            --region ${{ inputs.region || 'asia-southeast1' }} \
             --allow-unauthenticated \
             --port 3000 \
             --memory 1Gi \

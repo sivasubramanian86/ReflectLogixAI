@@ -50,8 +50,10 @@ jobs:
           if [ -f agents/requirements.txt ]; then pip install -r agents/requirements.txt; fi
 
       - name: Execute Pytest Suite
+        env:
+          PYTHONPATH: .
         run: |
-          pytest agents/tests/ -v
+          python -m pytest agents/tests/ -v
 
   security-scan:
     name: Gitleaks Secret & SAST Scan
