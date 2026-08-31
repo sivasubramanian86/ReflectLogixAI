@@ -1,0 +1,6 @@
+{
+  "name": "ReflectLogixAI – Your Multi Purpose Personal Gemini Journal",
+  "description": "User-authenticated multi-agent journaling & reflection coach on Google Cloud Run with Firebase Auth, Cloud Firestore zero-trust isolation, ADK orchestration, and Agentic RAG.",
+  "requestFramePermissions": ["microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

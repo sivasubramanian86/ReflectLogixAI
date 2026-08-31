@@ -1,0 +1,184 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User profile containing authenticated identity, preferences, and long-term reflection context.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique Firebase Auth UID of the user.",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address.",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user.",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "description": "User RBAC role: user or admin.",
+          "enum": ["user", "admin"]
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "Preferred language for journaling and reflections.",
+          "maxLength": 50
+        },
+        "bilingualOutput": {
+          "type": "boolean",
+          "description": "Whether to render bilingual summary outputs."
+        },
+        "createdTimestamp": {
+          "type": "number",
+          "description": "Account creation epoch timestamp."
+        },
+        "lastActiveTimestamp": {
+          "type": "number",
+          "description": "Last activity epoch timestamp."
+        }
+      },
+      "required": ["userId", "email", "role", "preferredLanguage"]
+    },
+    "JournalEntry": {
+      "title": "Journal Entry",
+      "description": "User-authored journal entry containing text, location, tags, and ADK reflection insights.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique journal entry document ID.",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID equal to request.auth.uid.",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the journal entry.",
+          "maxLength": 200
+        },
+        "content": {
+          "type": "string",
+          "description": "The body text of the journal entry.",
+          "maxLength": 50000
+        },
+        "language": {
+          "type": "string",
+          "description": "Language code or name of the entry.",
+          "maxLength": 50
+        },
+        "tags": {
+          "type": "array",
+          "description": "List of categorization tags."
+        },
+        "wordCount": {
+          "type": "number",
+          "description": "Calculated word count."
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds."
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last updated timestamp."
+        }
+      },
+      "required": ["userId", "title", "content", "createdAt", "updatedAt"]
+    },
+    "NotificationConfig": {
+      "title": "Notification Configuration",
+      "description": "User preferences for external webhook alerts (Slack, Discord, Email).",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID.",
+          "maxLength": 128
+        },
+        "slackWebhookUrl": {
+          "type": "string",
+          "description": "Optional encrypted or server-proxied Slack webhook URL.",
+          "maxLength": 500
+        },
+        "discordWebhookUrl": {
+          "type": "string",
+          "description": "Optional Discord webhook URL.",
+          "maxLength": 500
+        },
+        "emailAlertsEnabled": {
+          "type": "boolean",
+          "description": "Whether email alerts are enabled."
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last configuration update timestamp."
+        }
+      },
+      "required": ["userId", "emailAlertsEnabled", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "System security and administrative audit event.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Audit event ID.",
+          "maxLength": 128
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Event timestamp."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Associated user ID."
+        },
+        "action": {
+          "type": "string",
+          "description": "Action performed."
+        },
+        "resource": {
+          "type": "string",
+          "description": "Target resource."
+        },
+        "status": {
+          "type": "string",
+          "description": "Execution status: SUCCESS, DENIED, or ERROR."
+        }
+      },
+      "required": ["id", "timestamp", "userId", "action", "resource", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Private user profile documents, strictly isolated to the document owner."
+    },
+    "/users/{userId}/journals/{journalId}": {
+      "schema": { "$ref": "JournalEntry" },
+      "description": "Tenant-isolated personal journal entries and reflection insights."
+    },
+    "/users/{userId}/notifications/config": {
+      "schema": { "$ref": "NotificationConfig" },
+      "description": "User notification preferences and webhook configurations."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Admin registry collection for role verification."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "AuditLog" },
+      "description": "Append-only system audit logs restricted to admin read and server write."
+    }
+  }
+}

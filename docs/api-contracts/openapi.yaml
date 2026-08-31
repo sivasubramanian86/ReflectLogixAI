@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: ReflectLogixAI API
+  description: REST API for Multi-Agent Reflection Coaching and Zero-Trust Journaling
+  version: 3.1.0
+servers:
+  - url: /api
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /journals:
+    get:
+      summary: List user journals
+      responses:
+        '200':
+          description: List of journal entries
+    post:
+      summary: Create and optionally analyze journal entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                title: { type: string }
+                content: { type: string }
+                language: { type: string }
+                tags: { type: array, items: { type: string } }
+                autoAnalyze: { type: boolean }
+                isSensitive: { type: boolean }
+                detoxMode: { type: boolean }
+      responses:
+        '201':
+          description: Created
+  /journals/{id}/chat:
+    post:
+      summary: Multi-turn dialogue with Socratic Reflection Coach
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string }
+      responses:
+        '200':
+          description: Coach reply and updated conversation history
+  /admin/metrics:
+    get:
+      summary: System-wide analytics (Admin only)
+      responses:
+        '200':
+          description: Aggregated token counts, mood distribution, latency

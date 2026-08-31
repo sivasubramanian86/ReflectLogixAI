@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User profile containing authenticated identity, preferences, and long-term reflection context.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "preferredLanguage": { "type": "string", "maxLength": 50 },
+        "bilingualOutput": { "type": "boolean" },
+        "createdTimestamp": { "type": "number" },
+        "lastActiveTimestamp": { "type": "number" }
+      },
+      "required": ["userId", "email", "role", "preferredLanguage"]
+    },
+    "JournalEntry": {
+      "title": "Journal Entry",
+      "description": "User-authored journal entry containing text, location, tags, and ADK reflection insights.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "language": { "type": "string", "maxLength": 50 },
+        "tags": { "type": "array" },
+        "wordCount": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "title", "content", "createdAt", "updatedAt"]
+    },
+    "NotificationConfig": {
+      "title": "Notification Configuration",
+      "description": "User preferences for external webhook alerts (Slack, Discord, Email).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "slackWebhookUrl": { "type": "string", "maxLength": 500 },
+        "discordWebhookUrl": { "type": "string", "maxLength": 500 },
+        "emailAlertsEnabled": { "type": "boolean" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "emailAlertsEnabled", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "System security and administrative audit event.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "number" },
+        "userId": { "type": "string" },
+        "action": { "type": "string" },
+        "resource": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "timestamp", "userId", "action", "resource", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Private user profile documents, strictly isolated to the document owner."
+    },
+    "/users/{userId}/journals/{journalId}": {
+      "schema": { "$ref": "JournalEntry" },
+      "description": "Tenant-isolated personal journal entries and reflection insights."
+    },
+    "/users/{userId}/notifications/config": {
+      "schema": { "$ref": "NotificationConfig" },
+      "description": "User notification preferences and webhook configurations."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Admin registry collection for role verification."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "AuditLog" },
+      "description": "Append-only system audit logs restricted to admin read and server write."
+    }
+  }
+}

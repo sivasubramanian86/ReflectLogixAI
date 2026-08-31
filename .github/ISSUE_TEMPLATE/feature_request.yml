@@ -1,0 +1,29 @@
+name: Feature Request
+description: Propose a new capability or architectural enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest an idea for ReflectLogixAI.
+  - type: input
+    id: title
+    attributes:
+      label: Feature Title
+      placeholder: e.g. Add Voice Synthesis audio readout for micro-actions
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      placeholder: Describe the problem or opportunity
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      placeholder: Detailed description of the solution
+    validations:
+      required: true

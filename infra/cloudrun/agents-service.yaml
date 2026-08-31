@@ -1,0 +1,33 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: reflectlogixai-agents
+  labels:
+    cloud.googleapis.com/location: asia-southeast1
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "5"
+    spec:
+      containerConcurrency: 40
+      timeoutSeconds: 600
+      serviceAccountName: reflectlogixai-agents@appspot.gserviceaccount.com
+      containers:
+      - image: gcr.io/reflectlogixai-prod/agents:latest
+        ports:
+        - name: http1
+          containerPort: 8080
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: GEMINI_API_KEY
+              key: latest
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1Gi
