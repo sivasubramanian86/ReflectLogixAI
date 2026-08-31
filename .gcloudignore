@@ -1,0 +1,37 @@
+# .gcloudignore: Exclude non-production assets during Cloud Run deployment
+.git/
+.github/
+.gitignore
+.gcloudignore
+
+# Dependencies (built in container)
+node_modules/
+
+# Local build artifacts & caches
+coverage/
+.vitest/
+.nyc_output/
+*.tsbuildinfo
+
+# Python Virtualenvs & Caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+env/
+venv/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Development documentation and local testing scripts
+docs/
+scripts/
+.system_generated/
+*.log
+.DS_Store
+.idea/
+.vscode/

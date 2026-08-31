@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "reflectlogix-ai",
   "private": true,
-  "version": "0.0.0",
+  "version": "3.1.0",
+  "description": "ReflectLogixAI – Your Multi Purpose Personal Gemini Journal on Google Cloud Run",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
@@ -9,7 +10,10 @@
     "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "npx vitest run",
+    "test:agents": "python -m pytest agents/tests/",
+    "test:all": "npx vitest run && python -m pytest agents/tests/"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -25,6 +29,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
@@ -32,6 +37,6 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.3",
-    "@types/express": "^4.17.21"
+    "vitest": "^1.6.1"
   }
 }

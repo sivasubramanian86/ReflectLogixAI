@@ -24,5 +24,5 @@
     "noEmit": true
   },
   "include": ["src/**/*", "server/**/*", "server.ts", "apps/web/src/**/*", "apps/api/src/**/*"],
-  "exclude": ["node_modules", "dist", "apps/**/tests"]
+  "exclude": ["node_modules", "dist"]
 }
