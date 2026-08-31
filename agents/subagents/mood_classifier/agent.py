@@ -2,7 +2,7 @@
 Mood & Affect Classifier Subagent
 Extracts Russell's Circumplex affect coordinates (valence, arousal) and stress scores.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class MoodClassifierAgent:
     """

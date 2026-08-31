@@ -5,7 +5,7 @@
 
 set -eo pipefail
 
-PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo 'reflectlogixai-prod')}"
+PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo 'genai-apac-2026-491004')}"
 REGION="${GCP_REGION:-asia-southeast1}"
 SERVICE_NAME="${GCP_SERVICE_NAME:-reflectlogixai-journal}"
 SKIP_TESTS="${1:-}"
@@ -38,7 +38,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 10 \
-  --set-env-vars NODE_ENV=production,GEMINI_MODEL=gemini-3.7-flash
+  --set-env-vars NODE_ENV=production,GOOGLE_CLOUD_PROJECT="$PROJECT_ID",GOOGLE_CLOUD_LOCATION="$REGION",USE_VERTEX_AI=true,GEMINI_MODEL=gemini-3.7-flash
 
 echo -e "\n================================================================="
 echo "  DEPLOYMENT TO GOOGLE CLOUD RUN SUCCEEDED!"

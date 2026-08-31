@@ -2,7 +2,7 @@
 Localization & Cultural Nuance Subagent
 Handles multilingual transcription, idiom adaptation, and cross-language reflection mirroring.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class LocalizationAgent:
     """

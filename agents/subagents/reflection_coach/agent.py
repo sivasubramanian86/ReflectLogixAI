@@ -2,7 +2,7 @@
 Reflection Coach Subagent
 Responsible for Socratic inquiry, cognitive reframing, and resilience reinforcement.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class ReflectionCoachAgent:
     """

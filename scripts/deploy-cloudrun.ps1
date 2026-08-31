@@ -35,7 +35,7 @@ if (-not $ProjectId) {
 }
 
 if (-not $ProjectId -or $ProjectId -eq "(unset)") {
-    $ProjectId = "reflectlogixai-prod"
+    $ProjectId = "genai-apac-2026-491004"
 }
 
 Write-Host "Target Project:  $ProjectId" -ForegroundColor White
@@ -77,7 +77,7 @@ gcloud run deploy $ServiceName `
     --cpu 1 `
     --min-instances 0 `
     --max-instances 10 `
-    --set-env-vars NODE_ENV=production,GEMINI_MODEL=gemini-3.7-flash
+    --set-env-vars NODE_ENV=production,GOOGLE_CLOUD_PROJECT=$ProjectId,GOOGLE_CLOUD_LOCATION=$Region,USE_VERTEX_AI=true,GEMINI_MODEL=gemini-3.7-flash
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`n=================================================================" -ForegroundColor Cyan

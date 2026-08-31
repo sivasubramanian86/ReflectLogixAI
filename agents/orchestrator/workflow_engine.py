@@ -17,7 +17,10 @@ class ADKWorkflowEngine:
     Master Directed Acyclic Graph (DAG) Orchestration Engine for ReflectLogixAI.
     Coordinates 5 specialized subagents across parallel and sequential branches.
     """
-    def __init__(self, gemini_api_key: str = None):
+    def __init__(self, gemini_api_key: str = None, project_id: str = None, location: str = None):
+        self.use_vertex_ai = os.getenv("USE_VERTEX_AI", "true").lower() == "true" or bool(os.getenv("GOOGLE_CLOUD_PROJECT"))
+        self.project_id = project_id or os.getenv("GOOGLE_CLOUD_PROJECT", "genai-apac-2026-491004")
+        self.location = location or os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
         self.api_key = gemini_api_key or os.getenv("GEMINI_API_KEY")
         self.context_optimizer = ContextOptimizerAgent()
         self.mood_classifier = MoodClassifierAgent()
@@ -76,6 +79,8 @@ class ADKWorkflowEngine:
             "dag_metadata": {
                 "engine": "Google ADK Orchestrator v3.1",
                 "model": "gemini-3.7-flash",
+                "entryId": entry_id,
+                "userId": user_id,
                 "execution_time_ms": max(execution_time_ms, 120),
                 "total_tokens_estimated": 840,
                 "stages_completed": [

@@ -2,7 +2,7 @@
 GraphRAG Neo4j MCP Tool Client
 Traverses entity knowledge graph nodes (People, Places, Core Values, Goals, Habits, Emotions).
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class GraphRAGNeo4jMCPClient:
     """
