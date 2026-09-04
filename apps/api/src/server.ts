@@ -553,14 +553,22 @@ app.post('/api/admin/feature-flags', requireAuth, requireAdminRole, (req: Authen
 // VITE MIDDLEWARE SETUP
 // ----------------------------------------------------
 async function startServer() {
+  const webDir = path.resolve(process.cwd(), 'apps/web');
+  const webDist = path.resolve(process.cwd(), 'apps/web/dist');
+  const defaultDist = path.resolve(process.cwd(), 'dist');
+
   if (process.env.NODE_ENV !== 'production') {
+    const fs = await import('fs');
+    const rootPath = fs.existsSync(webDir) ? webDir : process.cwd();
     const vite = await createViteServer({
+      root: rootPath,
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const fs = await import('fs');
+    const distPath = fs.existsSync(webDist) ? webDist : defaultDist;
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
@@ -573,3 +581,4 @@ async function startServer() {
 }
 
 startServer();
+

@@ -5,10 +5,10 @@
   "description": "ReflectLogixAI – Your Multi Purpose Personal Gemini Journal on Google Cloud Run",
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "dev": "tsx apps/api/src/server.ts",
+    "build": "vite build apps/web && esbuild apps/api/src/server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
-    "preview": "vite preview",
+    "preview": "vite preview apps/web",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "test": "npx vitest run",

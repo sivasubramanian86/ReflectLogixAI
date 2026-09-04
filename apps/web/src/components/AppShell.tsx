@@ -331,13 +331,10 @@ export const AppShell: React.FC<AppShellProps> = ({
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-64 rounded-2xl glass-card border border-white/40 dark:border-white/10 shadow-2xl p-2 z-50 space-y-1">
                   <div className="p-2.5 border-b border-[var(--border-subtle)]">
-                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">
-                      {user?.displayName || 'Reflective User'}
+                    <p className="text-sm font-bold text-[var(--text-primary)] truncate">
+                      {user?.displayName || 'Sivasubramanian'}
                     </p>
-                    <p className="text-[11px] text-[var(--text-muted)] truncate">
-                      {user?.email || 'siva@example.com'}
-                    </p>
-                    <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md bg-teal-500/10 text-[10px] font-bold text-teal-700 dark:text-teal-300">
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-md bg-teal-500/10 text-[10px] font-bold text-teal-700 dark:text-teal-300">
                       {user?.role === 'admin' ? 'Workspace Admin' : 'Personal Journaler'}
                     </span>
                   </div>

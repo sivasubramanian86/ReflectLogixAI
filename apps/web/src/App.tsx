@@ -13,6 +13,7 @@ import { NotificationSettings } from './components/NotificationSettings';
 import { ArchitectureDocsModal } from './components/ArchitectureDocsModal';
 import { GeminiLiveVoiceModal } from './components/GeminiLiveVoiceModal';
 import { LiveVoiceAssistantModal } from './components/LiveVoiceAssistantModal';
+import { HomeCompanionHero } from './components/HomeCompanionHero';
 import { ArrivalModal } from './components/ArrivalModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AboutPage } from './pages/AboutPage';
@@ -245,6 +246,20 @@ function MainAppContent() {
 
           {/* Center: Canvas & Insights */}
           <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-4 sm:p-6 space-y-6">
+            {/* 3D Virtual Voice Assistant Hero Widget */}
+            <div className="max-w-4xl mx-auto w-full">
+              <HomeCompanionHero
+                userName={user?.displayName || 'Sivasubramanian'}
+                preferredLanguage={user?.preferredLanguage || 'English'}
+                onJournalCreated={(newEntry) => {
+                  setJournals(prev => [newEntry, ...prev]);
+                  setSelectedJournal(newEntry);
+                  setIsCreatingNew(false);
+                }}
+                onOpenFullModal={() => setShowLiveVoiceModal(true)}
+              />
+            </div>
+
             {isCreatingNew || !selectedJournal ? (
               <JournalEditor
                 initialContent={initialEditorContent}

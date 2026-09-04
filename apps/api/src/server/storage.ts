@@ -30,7 +30,7 @@ class FirestoreDatabaseStore {
     const adminProfile: UserProfile = {
       userId: adminUserId,
       email: adminEmail,
-      displayName: 'Kailasam Siva',
+      displayName: 'Sivasubramanian',
       role: 'admin',
       preferredLanguage: 'English',
       bilingualOutput: true,
