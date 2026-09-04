@@ -504,6 +504,38 @@ app.post('/api/assistant/daily-summary', requireAuth, async (req: AuthenticatedR
   }
 });
 
+// Socratic Coaching Voice Endpoint
+app.post('/api/chat/socratic-coach', async (req: Request, res: Response) => {
+  const { message, tone, language, history } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  try {
+    const gemini = getGeminiClient();
+    const systemPrompt = `You are a mindful AI reflection coach in ReflectLogixAI.
+Your coaching style is ${tone || 'socratic'} (socratic = questioning assumptions, empathetic = supportive validation, action-oriented = small concrete steps, strategic = long-term vision).
+Language: ${language || 'en'}.
+Keep response concise, empathetic, conversational, and direct (1-3 sentences). Focus on asking powerful reflective questions.`;
+
+    const contents = `${systemPrompt}\n\nUser: ${message}\nCoach:`;
+    const response = await gemini.models.generateContent({
+      model: GEMINI_MODELS.DEFAULT_ORCHESTRATOR,
+      contents,
+      config: {
+        temperature: 0.7,
+        maxOutputTokens: 250,
+      }
+    });
+
+    const reply = response.text?.trim() || "What is one insight you are taking away from this moment?";
+    res.json({ reply });
+  } catch (err: any) {
+    console.error('[API] Socratic Coach error:', err);
+    res.status(500).json({ error: 'Failed to generate coaching response', details: err.message });
+  }
+});
+
 // ----------------------------------------------------
 // ADMIN RBAC PORTAL & AUDIT LOGS
 // ----------------------------------------------------

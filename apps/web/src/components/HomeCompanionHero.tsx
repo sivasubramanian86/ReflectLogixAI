@@ -95,9 +95,20 @@ export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
 
     const clean = text.replace(/[#*_`]/g, '').replace(/\n+/g, ' ');
     const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.rate = 1.05;
+    utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.lang = preferredLanguage === 'Tamil' ? 'ta-IN' : preferredLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
+
+    const voices = synthRef.current.getVoices();
+    const targetLang = utterance.lang.toLowerCase();
+    const naturalVoice = voices.find(v => 
+      (v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0])) &&
+      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Jenny') || v.name.includes('Samantha'))
+    ) || voices.find(v => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0]));
+
+    if (naturalVoice) {
+      utterance.voice = naturalVoice;
+    }
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
