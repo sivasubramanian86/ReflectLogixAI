@@ -12,47 +12,13 @@
 
 ## 🏛️ System Architecture
 
-```mermaid
-graph TD
-    Client["Browser & Mobile Client<br/>(3-Pane WCAG 2.2 AA UI • 18+ Locales)"]
-    
-    subgraph CloudRun["Google Cloud Run (apps/api + web)"]
-        AuthMiddleware["Auth & Tenant Isolation Middleware<br/>(Firebase JWT Verification)"]
-        ExpressRouter["Express API Gateway<br/>(/api/journals, /api/mcp, /api/admin)"]
-        ADKOrchestrator["ADK Multi-Agent Orchestrator<br/>(Directed Acyclic Graph DAG)"]
-        
-        subgraph Subagents["Specialized Subagents"]
-            CoachAgent["Reflection Coach<br/>(Socratic Inquiries)"]
-            MoodAgent["Mood Classifier<br/>(Valence / Arousal / Stress)"]
-            PlannerAgent["Micro-Action Planner<br/>(SMART Habits)"]
-            LocalizationAgent["Localization Agent<br/>(18+ APAC & Global Languages)"]
-            ContextAgent["Context Optimizer<br/>(Token Compaction)"]
-        end
-        
-        MCPToolbox["MCP Toolbox Integration"]
-    end
-    
-    subgraph GCP["Google Cloud Platform Services"]
-        Firestore[("Cloud Firestore<br/>(Tenant-Isolated Collections)")]
-        Gemini["Google Gemini 3.7 Flash<br/>(@google/genai SDK)"]
-        SecretMgr["Cloud Secret Manager<br/>(API Keys & Webhooks)"]
-        BigQuery[("BigQuery<br/>(Affect Analytics)")]
-        PgVector[("Cloud SQL pgvector<br/>(Semantic Search)")]
-        Neo4j[("GraphRAG / Neo4j<br/>(Entity Life Graph)")]
-    end
-    
-    Client --> AuthMiddleware
-    AuthMiddleware --> ExpressRouter
-    ExpressRouter --> ADKOrchestrator
-    ADKOrchestrator --> Subagents
-    Subagents --> Gemini
-    ExpressRouter --> Firestore
-    ExpressRouter --> SecretMgr
-    ExpressRouter --> MCPToolbox
-    MCPToolbox --> BigQuery
-    MCPToolbox --> PgVector
-    MCPToolbox --> Neo4j
-```
+![ReflectLogixAI Enterprise Architecture](docs/assets/architecture_overview.jpg)
+
+> 📖 **Architecture & Deep Dive Documentation:**
+> - [System Architecture Specification & Topology](docs/architecture/system-architecture.md)
+> - [End-to-End User Experience & Interaction Flow](docs/architecture/user-flow.md)
+> - [Google ADK Multi-Agent Orchestration Mesh](docs/architecture/multi-agent-mesh.md)
+> - [Zero-Trust Security & IAM Specification](infra/security_spec.md)
 
 ---
 
