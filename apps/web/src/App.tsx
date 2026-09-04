@@ -12,6 +12,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { NotificationSettings } from './components/NotificationSettings';
 import { ArchitectureDocsModal } from './components/ArchitectureDocsModal';
 import { GeminiLiveVoiceModal } from './components/GeminiLiveVoiceModal';
+import { LiveVoiceAssistantModal } from './components/LiveVoiceAssistantModal';
 import { ArrivalModal } from './components/ArrivalModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AboutPage } from './pages/AboutPage';
@@ -414,16 +415,16 @@ function MainAppContent() {
       )}
 
       {showLiveVoiceModal && (
-        <GeminiLiveVoiceModal
+        <LiveVoiceAssistantModal
           isOpen={showLiveVoiceModal}
           onClose={() => setShowLiveVoiceModal(false)}
-          onSaveVoiceEntry={async (_title, transcript) => {
-            if (transcript.trim()) {
-              setIsCreatingNew(true);
-              setInitialEditorContent(`Voice Reflection:\n${transcript}\n\n`);
-              setActiveTab('journal');
-              setShowLiveVoiceModal(false);
-            }
+          preferredLanguage={currentLanguage}
+          userName={user?.displayName || 'Siva'}
+          onJournalCreated={(entry) => {
+            setJournals((prev) => [entry, ...prev]);
+            setSelectedJournal(entry);
+            setActiveTab('journal');
+            setShowLiveVoiceModal(false);
           }}
         />
       )}

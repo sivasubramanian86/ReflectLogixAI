@@ -483,6 +483,28 @@ export const AppShell: React.FC<AppShellProps> = ({
           {children}
         </main>
       </div>
+
+      {/* Floating 3D Live Voice Assistant Trigger Pill */}
+      <button
+        type="button"
+        onClick={onOpenLiveVoice}
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-3 px-4 py-2.5 rounded-full bg-slate-900/90 hover:bg-slate-900 border border-cyan-500/40 text-white shadow-2xl hover:shadow-cyan-500/30 backdrop-blur-xl transition-all hover:scale-105 group focus-ring cursor-pointer"
+        aria-label="Open Nova Live 3D Voice Assistant"
+      >
+        <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-cyan-400 shadow-md">
+          <img src="/assets/avatar.jpg" alt="Nova" className="w-full h-full object-cover" />
+          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-1 ring-slate-900 animate-pulse" />
+        </div>
+        <div className="flex flex-col text-left">
+          <span className="text-xs font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent group-hover:from-cyan-200 group-hover:to-pink-200">
+            Nova Live Assistant
+          </span>
+          <span className="text-[10px] text-slate-400 font-medium">Talk & Synthesize</span>
+        </div>
+        <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
+          <Mic className="w-3.5 h-3.5" />
+        </div>
+      </button>
     </div>
   );
 };

@@ -16,6 +16,7 @@
 
 > 📖 **Architecture & Deep Dive Documentation:**
 > - [System Architecture Specification & Topology](docs/architecture/system-architecture.md)
+> - [Live 3D Virtual Voice Assistant (Nova)](docs/architecture/virtual-voice-assistant.md)
 > - [End-to-End User Experience & Interaction Flow](docs/architecture/user-flow.md)
 > - [Google ADK Multi-Agent Orchestration Mesh](docs/architecture/multi-agent-mesh.md)
 > - [Zero-Trust Security & IAM Specification](infra/security_spec.md)

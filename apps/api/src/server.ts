@@ -8,6 +8,7 @@ import { ADKOrchestrationEngine } from './server/adk-agents';
 import { BigQueryMCPToolbox, PgVectorMCPToolbox, GraphRAGMCPToolbox } from './server/mcp-tools';
 import { ExternalNotificationDispatcher } from './server/notifications';
 import { getGeminiClient, GEMINI_MODELS } from './server/gemini';
+import { LiveAssistantService } from './server/assistant';
 import { SystemHealthMetrics } from './types';
 
 dotenv.config();
@@ -461,6 +462,46 @@ app.post('/api/notifications/test', requireAuth, async (req: AuthenticatedReques
   );
 
   res.json(dispatchResult);
+});
+
+// ----------------------------------------------------
+// LIVE VIRTUAL ASSISTANT (Voice & RAG Interaction)
+// ----------------------------------------------------
+app.post('/api/assistant/chat', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
+  const { messages, preferredLanguage } = req.body;
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'Messages array is required.' });
+  }
+
+  try {
+    const result = await LiveAssistantService.processConversation(
+      userId,
+      messages,
+      preferredLanguage || req.user?.preferredLanguage || 'English'
+    );
+    res.json(result);
+  } catch (err: any) {
+    console.error('[API] Assistant error:', err);
+    res.status(500).json({ error: 'Failed to process assistant conversation', details: err.message });
+  }
+});
+
+app.post('/api/assistant/daily-summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user!.userId;
+  const { preferredLanguage } = req.body;
+
+  try {
+    const summary = await LiveAssistantService.generateDailySummary(
+      userId,
+      preferredLanguage || req.user?.preferredLanguage || 'English'
+    );
+    res.json({ success: true, journal: summary });
+  } catch (err: any) {
+    console.error('[API] Daily summary error:', err);
+    res.status(500).json({ error: 'Failed to generate daily summary', details: err.message });
+  }
 });
 
 // ----------------------------------------------------
