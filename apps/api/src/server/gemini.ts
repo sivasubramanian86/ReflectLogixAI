@@ -11,10 +11,11 @@ let aiClient: GoogleGenAI | null = null;
  */
 export function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
-    const useVertexAI = process.env.USE_VERTEX_AI === 'true' || Boolean(process.env.GOOGLE_CLOUD_PROJECT);
-    const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'genai-apac-2026-491004';
-    const location = process.env.GOOGLE_CLOUD_LOCATION || 'asia-southeast1';
     const apiKey = process.env.GEMINI_API_KEY;
+    const isExplicitDevKey = apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey !== 'dummy-key' && apiKey.length > 20;
+    const useVertexAI = process.env.USE_VERTEX_AI === 'true' || !isExplicitDevKey;
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'genai-apac-2026-491004';
+    const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
 
     if (useVertexAI) {
       console.log(`[Vertex AI] Initializing Vertex AI on GCP Project: ${projectId}, Location: ${location}`);
@@ -31,7 +32,7 @@ export function getGeminiClient(): GoogleGenAI {
     } else {
       console.log('[Gemini Developer API] Initializing with Gemini API key.');
       aiClient = new GoogleGenAI({
-        apiKey: apiKey || 'dummy-key',
+        apiKey: apiKey,
         httpOptions: {
           headers: {
             'User-Agent': 'ReflectLogixAI-Dev/3.1.0',
@@ -44,8 +45,8 @@ export function getGeminiClient(): GoogleGenAI {
 }
 
 export const GEMINI_MODELS = {
-  DEFAULT_ORCHESTRATOR: process.env.GEMINI_MODEL || 'gemini-3.7-flash',
-  FAST_ANALYTICS: 'gemini-3.7-flash',
-  DEEP_REFLECTION: 'gemini-3.7-flash',
-  AUDIO_TRANSCRIBE: 'gemini-3.5-transcribe',
+  DEFAULT_ORCHESTRATOR: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  FAST_ANALYTICS: 'gemini-2.5-flash',
+  DEEP_REFLECTION: 'gemini-2.5-flash',
+  AUDIO_TRANSCRIBE: 'gemini-2.5-flash',
 };
