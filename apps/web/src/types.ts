@@ -7,6 +7,7 @@ export type UserRole = 'user' | 'admin';
 
 export type NavigationTab =
   | 'journal'
+  | 'reflection_coach'
   | 'multimodal'
   | 'health_sync'
   | 'lifestyle_flashcards'

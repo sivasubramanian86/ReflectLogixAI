@@ -7,6 +7,7 @@ export const ar: TranslationDictionary = {
 
   nav: {
     journal: 'مذكراتي',
+    reflectionCoach: 'المدرب السقراطي',
     multimodal: 'استوديو الوسائط',
     healthSync: 'الصحة والأجهزة الذكية',
     lifestyleFlashcards: 'بطاقات نمط الحياة',

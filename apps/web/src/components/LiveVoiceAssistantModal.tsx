@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { VoiceVisualizer3D } from './VoiceVisualizer3D';
 import { apiRequest } from '../services/apiClient';
 import { JournalEntry } from '../types';
+import { useI18n, getLanguageBCP47, getNovaGreeting } from '../i18n';
 import {
   Mic,
   MicOff,

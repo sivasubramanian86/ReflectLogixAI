@@ -19,6 +19,7 @@ import { SmartHealthTrackerView } from './components/SmartHealthTrackerView';
 import { LifestyleFlashcardsView } from './components/LifestyleFlashcardsView';
 import { PredictiveLifePlannerView } from './components/PredictiveLifePlannerView';
 import { MultiModalMediaHub } from './components/MultiModalMediaHub';
+import { ReflectionCoachWorkspace } from './components/ReflectionCoachWorkspace';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AboutPage } from './pages/AboutPage';
 import { FAQPage } from './pages/FAQPage';
@@ -39,7 +40,8 @@ import {
   Sparkles,
   Calendar,
   Trash2,
-  MapPin
+  MapPin,
+  ArrowRight
 } from 'lucide-react';
 
 const DEFAULT_USER_PROFILE: UserProfile = {
@@ -111,7 +113,8 @@ Goal for this evening: disconnect completely by 9 PM to preserve restorative sle
           description: 'Transition devices to charging station away from bedside.',
           timeframe: 'today',
           priority: 'high',
-          completed: true
+          completed: true,
+          category: 'rest'
         },
         {
           id: 'act_002',
@@ -119,7 +122,8 @@ Goal for this evening: disconnect completely by 9 PM to preserve restorative sle
           description: 'Perform 4-7-8 grounding breaths before checking email inbox.',
           timeframe: 'this_week',
           priority: 'medium',
-          completed: true
+          completed: true,
+          category: 'wellness'
         }
       ],
       longitudinalGrowth: {
@@ -173,7 +177,8 @@ Key realization: Slowing down intentionally actually speeds up long-term archite
           description: 'Drink 500ml water with electrolytes after morning walk.',
           timeframe: 'today',
           priority: 'medium',
-          completed: true
+          completed: true,
+          category: 'wellness'
         }
       ]
     }
@@ -220,7 +225,8 @@ Key agenda points to highlight: zero-trust Cloud KMS envelope encryption, ADK mu
           description: 'Double-check Cloud KMS key rotation policy before 11 AM.',
           timeframe: 'today',
           priority: 'high',
-          completed: false
+          completed: false,
+          category: 'productivity'
         }
       ]
     }
@@ -534,21 +540,59 @@ function MainAppContent() {
                   )}
                 </div>
 
-                {/* Friendly Coach Reflection Card */}
+                {/* Socratic Coach Quick Access Banner */}
                 {selectedJournal.reflection && (
-                  <ReflectionCard reflection={selectedJournal.reflection} />
-                )}
+                  <div className="glass-card rounded-2xl p-5 border border-teal-500/20 bg-gradient-to-r from-teal-500/5 via-indigo-500/5 to-transparent space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-teal-700 dark:text-teal-400 font-bold text-sm">
+                          <Sparkles className="h-4 w-4" />
+                          <span>Socratic Reflection Coach & Empathetic Chat</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                          Deep cognitive reframing, Socratic questions, and interactive coach dialogue ready in your dedicated workspace.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('reflection_coach')}
+                        className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold shadow-xs focus-ring flex items-center space-x-1.5 shrink-0 transition-all cursor-pointer"
+                      >
+                        <span>Open Coach Workspace</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
 
-                {/* Multi-turn Empathetic Conversation Thread */}
-                <ConversationThread
-                  journal={selectedJournal}
-                  onUpdateJournal={handleUpdateJournal}
-                />
+                    {selectedJournal.reflection.microActions && selectedJournal.reflection.microActions.length > 0 && (
+                      <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                          Top Micro-Actions
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {selectedJournal.reflection.microActions.slice(0, 2).map((action) => (
+                            <div
+                              key={action.id}
+                              onClick={() => handleToggleAction(action.id, action.completed)}
+                              className="p-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] hover:border-teal-500/40 text-xs flex items-center space-x-2 cursor-pointer transition-colors"
+                            >
+                              <span className={`h-4 w-4 rounded flex items-center justify-center border text-[10px] ${action.completed ? 'bg-teal-600 border-teal-600 text-white' : 'border-[var(--border-strong)]'}`}>
+                                {action.completed && '✓'}
+                              </span>
+                              <span className={`truncate font-medium ${action.completed ? 'line-through text-[var(--text-muted)]' : 'text-[var(--text-primary)]'}`}>
+                                {action.title}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          {/* Right: Insights & Reflection Coach */}
+          {/* Right: Insights & Consistency Streak */}
           <RightInsightsPane
             selectedJournal={selectedJournal}
             onOpenLiveVoice={() => setShowLiveVoiceModal(true)}
@@ -558,6 +602,17 @@ function MainAppContent() {
             }}
           />
         </div>
+      )}
+
+      {/* 2. DEDICATED REFLECTION COACH & EMPATHETIC CHAT */}
+      {activeTab === 'reflection_coach' && (
+        <ReflectionCoachWorkspace
+          journals={journals}
+          selectedJournal={selectedJournal}
+          onSelectJournal={setSelectedJournal}
+          onUpdateJournal={handleUpdateJournal}
+          onToggleAction={handleToggleAction}
+        />
       )}
 
       {/* 2. MULTI-MODAL MEDIA STUDIO */}

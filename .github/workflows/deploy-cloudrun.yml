@@ -30,8 +30,8 @@ jobs:
     env:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
       WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-      GCP_PROJECT: ${{ inputs.project_id || 'genai-apac-2026-491004' }}
-      GCP_REGION: ${{ inputs.region || 'asia-southeast1' }}
+      GCP_PROJECT: ${{ github.event.inputs.project_id || 'genai-apac-2026-491004' }}
+      GCP_REGION: ${{ github.event.inputs.region || 'asia-southeast1' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

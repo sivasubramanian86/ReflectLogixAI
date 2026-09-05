@@ -7,6 +7,7 @@ export const gu: TranslationDictionary = {
 
   nav: {
     journal: 'મારું જર્નલ',
+    reflectionCoach: 'આત્મચિંતન કોચ',
     multimodal: 'મીડિયા સ્ટુડિયો',
     healthSync: 'આરોગ્ય & સ્માર્ટવોચ',
     lifestyleFlashcards: 'લાઈફસ્ટાઈલ ફ્લેશકાર્ડ્સ',

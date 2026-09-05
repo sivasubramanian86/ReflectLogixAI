@@ -20,7 +20,8 @@ import {
   Settings,
   Heart,
   HelpCircle,
-  Plus
+  Plus,
+  Brain
 } from 'lucide-react';
 import { UserProfile, NavigationTab } from '../types';
 import { useI18n } from '../i18n';
@@ -101,6 +102,12 @@ export const AppShell: React.FC<AppShellProps> = ({
       id: 'journal' as const,
       label: t.nav.journal || 'My Journal',
       icon: BookOpen,
+      adminOnly: false,
+    },
+    {
+      id: 'reflection_coach' as const,
+      label: t.nav.reflectionCoach || 'Reflection Coach',
+      icon: Brain,
       adminOnly: false,
     },
     {

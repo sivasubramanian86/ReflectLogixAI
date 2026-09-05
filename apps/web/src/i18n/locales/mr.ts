@@ -7,6 +7,7 @@ export const mr: TranslationDictionary = {
 
   nav: {
     journal: 'माझे जर्नल',
+    reflectionCoach: 'चिंतन प्रशिक्षक',
     multimodal: 'मीडिया स्टुडिओ',
     healthSync: 'आरोग्य & स्मार्टवॉच',
     lifestyleFlashcards: 'जीवनशैली फ्लॅशकार्ड्स',

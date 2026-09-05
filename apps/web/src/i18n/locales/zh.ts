@@ -7,6 +7,7 @@ export const zh: TranslationDictionary = {
 
   nav: {
     journal: '我的日记',
+    reflectionCoach: '反思教练',
     multimodal: '媒体工作室',
     healthSync: '健康与智能设备',
     lifestyleFlashcards: '长寿知识卡片',

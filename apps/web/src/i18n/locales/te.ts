@@ -7,6 +7,7 @@ export const te: TranslationDictionary = {
 
   nav: {
     journal: 'నా జర్నల్',
+    reflectionCoach: 'ఆత్మపరిశీలన కోచ్',
     multimodal: 'మీడియా స్టూడియో',
     healthSync: 'ఆరోగ్యం & స్మార్ట్‌వాచ్',
     lifestyleFlashcards: 'జీవనశైలి ఫ్లాష్‌కార్డులు',

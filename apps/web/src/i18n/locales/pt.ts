@@ -7,6 +7,7 @@ export const pt: TranslationDictionary = {
 
   nav: {
     journal: 'Meu Diário',
+    reflectionCoach: 'Coach Socrático',
     multimodal: 'Estúdio Mídia',
     healthSync: 'Saúde & Wearables',
     lifestyleFlashcards: 'Cartões de Longevidade',

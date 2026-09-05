@@ -7,6 +7,7 @@ export const ta: TranslationDictionary = {
 
   nav: {
     journal: 'என் டைரி',
+    reflectionCoach: 'சுயபரிசீலனை வழிகாட்டி',
     multimodal: 'மீடியா ஸ்டுடியோ',
     healthSync: 'உடல்நலம் & ஸ்மார்ட் வாட்ச்',
     lifestyleFlashcards: 'நீண்ட ஆயுள் அட்டைகள்',

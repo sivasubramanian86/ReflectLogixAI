@@ -7,6 +7,7 @@ export const pa: TranslationDictionary = {
 
   nav: {
     journal: 'ਮੇਰਾ ਜਰਨਲ',
+    reflectionCoach: 'ਚਿੰਤਨ ਕੋਚ',
     multimodal: 'ਮੀਡੀਆ ਸਟੂਡੀਓ',
     healthSync: 'ਸਿਹਤ & ਸਮਾਰਟਵਾਚ',
     lifestyleFlashcards: 'ਲਾਈਫਸਟਾਈਲ ਫਲੈਸ਼ਕਾਰਡ',

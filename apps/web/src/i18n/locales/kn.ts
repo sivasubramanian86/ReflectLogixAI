@@ -7,6 +7,7 @@ export const kn: TranslationDictionary = {
 
   nav: {
     journal: 'ನನ್ನ ಜರ್ನಲ್',
+    reflectionCoach: 'ಆತ್ಮಾವಲೋಕನ ಕೋಚ್',
     multimodal: 'ಮೀಡಿಯಾ ಸ್ಟುಡಿಯೋ',
     healthSync: 'ಆರೋಗ್ಯ & ಸ್ಮಾರ್ಟ್‌ವಾಚ್',
     lifestyleFlashcards: 'ಜೀವನಶೈಲಿ ಫ್ಲ್ಯಾಶ್‌ಕಾರ್ಡ್‌ಗಳು',

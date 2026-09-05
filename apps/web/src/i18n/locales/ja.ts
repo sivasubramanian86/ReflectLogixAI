@@ -7,6 +7,7 @@ export const ja: TranslationDictionary = {
 
   nav: {
     journal: 'マージャーナル',
+    reflectionCoach: '内省コーチ',
     multimodal: 'メディア スタジオ',
     healthSync: '健康＆ウェアラブル',
     lifestyleFlashcards: '長寿フラッシュカード',

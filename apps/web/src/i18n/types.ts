@@ -6,6 +6,7 @@ export interface TranslationDictionary {
   // Navigation
   nav: {
     journal: string;
+    reflectionCoach?: string;
     multimodal?: string;
     healthSync?: string;
     lifestyleFlashcards?: string;
