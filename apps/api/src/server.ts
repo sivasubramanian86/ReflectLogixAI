@@ -11,6 +11,8 @@ import { getGeminiClient, GEMINI_MODELS } from './server/gemini';
 import { LiveAssistantService } from './server/assistant';
 import { SystemHealthMetrics } from './types';
 
+import { LLMSecurityGuardrail } from './server/security';
+
 dotenv.config();
 
 const PORT = 3000;
@@ -19,6 +21,31 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Enterprise Security Headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
+// Rate Limiting Middleware (DDoS & Token Abuse Protection)
+app.use('/api/', (req: Request, res: Response, next) => {
+  const clientKey = (req.headers['x-forwarded-for'] as string) || req.ip || 'anonymous_client';
+  const { allowed, remaining } = LLMSecurityGuardrail.checkRateLimit(clientKey, 120, 60000);
+  res.setHeader('X-RateLimit-Remaining', remaining.toString());
+
+  if (!allowed) {
+    return res.status(429).json({
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded. Please wait a moment before sending more requests.',
+      retryAfterSeconds: 60
+    });
+  }
+  next();
+});
 
 // Feature Flags in Memory
 const featureFlags = {

@@ -2,6 +2,7 @@ import { getGeminiClient, GEMINI_MODELS } from './gemini';
 import { dbStore } from './storage';
 import { BigQueryMCPToolbox, PgVectorMCPToolbox, GraphRAGMCPToolbox } from './mcp-tools';
 import { ADKOrchestrationEngine } from './adk-agents';
+import { LLMSecurityGuardrail } from './security';
 import { JournalEntry, UserProfile } from '../types';
 
 export interface AssistantMessage {
@@ -20,7 +21,7 @@ export interface AssistantResponse {
 }
 
 /**
- * Live Virtual Assistant Service powered by Gemini 3.7 Flash
+ * Live Virtual Assistant Service powered by Gemini 2.5 Flash
  * Provides real-time conversational intelligence, Agentic RAG,
  * BigQuery analytics, subagent mesh delegation, and daily summary generation.
  */
@@ -32,15 +33,34 @@ export class LiveAssistantService {
   ): Promise<AssistantResponse> {
     const userProfile = dbStore.getUser(userId) || {
       userId,
-      displayName: 'Siva',
+      displayName: 'Sivasubramanian',
       preferredLanguage: 'English',
       longTermProfile: { summary: 'Mindful Cloud Architect' }
     } as UserProfile;
 
     const journals = dbStore.getJournals(userId);
-    const lastUserMsg = messages.filter(m => m.role === 'user').pop()?.content || '';
+    const rawUserMsg = messages.filter(m => m.role === 'user').pop()?.content || '';
+
+    // OWASP LLM01 & LLM02 Security Guardrail Scan
+    const securityScan = LLMSecurityGuardrail.scanAndSanitize(rawUserMsg);
+    const lastUserMsg = securityScan.sanitizedText;
 
     const toolsUsed: Array<{ name: string; description: string; data?: any }> = [];
+
+    if (!securityScan.isSafe || securityScan.piiMaskedCount > 0) {
+      toolsUsed.push({
+        name: 'security_guardrail_sanitizer',
+        description: `Applied OWASP LLM Guardrails: Neutralized ${securityScan.violations.length} injection vector(s), masked ${securityScan.piiMaskedCount} sensitive PII item(s).`,
+        data: { violations: securityScan.violations, piiMaskedCount: securityScan.piiMaskedCount }
+      });
+      dbStore.logAudit(
+        userId,
+        'SECURITY_GUARDRAIL_INTERVENTION',
+        'assistant/chat',
+        securityScan.isSafe ? 'SUCCESS' : 'DENIED',
+        `Sanitized input. Violations: ${securityScan.violations.join(', ')}`
+      );
+    }
 
     // Analyze intent to see if MCP tools or subagents should be proactively invoked
     const lower = lastUserMsg.toLowerCase();

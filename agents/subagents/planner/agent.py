@@ -10,7 +10,7 @@ class MicroActionPlannerAgent:
     Subagent that decomposes introspective insights into 2-3 SMART behavioral micro-actions.
     Tags actions with timeframe, priority, and category (wellness, productivity, rest, habit).
     """
-    def __init__(self, model_name: str = "gemini-3.7-flash"):
+    def __init__(self, model_name: str = "gemini-2.5-flash"):
         self.model_name = model_name
 
     def synthesize_micro_actions(self, entry_text: str, themes: List[str]) -> List[Dict[str, Any]]:
@@ -27,6 +27,7 @@ class MicroActionPlannerAgent:
                 "category": "REST",
                 "timeHorizon": "TODAY",
                 "priority": "HIGH",
+                "estimatedMinutes": 30,
                 "completed": False
             })
 
@@ -38,6 +39,7 @@ class MicroActionPlannerAgent:
                 "category": "PRODUCTIVITY",
                 "timeHorizon": "TOMORROW",
                 "priority": "HIGH",
+                "estimatedMinutes": 25,
                 "completed": False
             })
 
@@ -49,6 +51,7 @@ class MicroActionPlannerAgent:
             "category": "WELLNESS",
             "timeHorizon": "TODAY",
             "priority": "MEDIUM",
+            "estimatedMinutes": 2,
             "completed": False
         })
 
