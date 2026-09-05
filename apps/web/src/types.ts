@@ -104,7 +104,13 @@ export interface ReflectionInsight {
   reframeSuggestions: string[];
   socraticQuestions: string[];
   microActions: MicroAction[];
-  keyThemes: string[];
+  keyThemes?: string[];
+  longitudinalGrowth?: {
+    patternDetected: string;
+    trendDirection: string;
+    consistencyScore: number;
+    coachNote: string;
+  };
 }
 
 export interface JournalChatMessage {

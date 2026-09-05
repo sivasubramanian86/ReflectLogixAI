@@ -126,6 +126,7 @@ Goal for this evening: disconnect completely by 9 PM to preserve restorative sle
           category: 'wellness'
         }
       ],
+      keyThemes: ['Mindful Resilience', 'Architecture Pacing', 'Sleep Hygiene'],
       longitudinalGrowth: {
         patternDetected: 'Positive correlation between morning pauses and sustained evening cognitive energy.',
         trendDirection: 'improving',
@@ -180,7 +181,8 @@ Key realization: Slowing down intentionally actually speeds up long-term archite
           completed: true,
           category: 'wellness'
         }
-      ]
+      ],
+      keyThemes: ['Physical Vitality', 'Morning Clarity', '10k Steps']
     }
   },
   {
@@ -228,7 +230,8 @@ Key agenda points to highlight: zero-trust Cloud KMS envelope encryption, ADK mu
           completed: false,
           category: 'productivity'
         }
-      ]
+      ],
+      keyThemes: ['Cloud Architecture', 'Zero-Trust Security', 'Leadership Alignment']
     }
   }
 ];
@@ -352,6 +355,21 @@ function MainAppContent() {
   const handleUpdateJournal = (updated: JournalEntry) => {
     setSelectedJournal(updated);
     setJournals((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
+  };
+
+  const handleToggleAction = async (actionId: string, currentCompleted: boolean) => {
+    if (!selectedJournal || !selectedJournal.reflection?.microActions) return;
+    const updatedActions = selectedJournal.reflection.microActions.map((a) =>
+      a.id === actionId ? { ...a, completed: !currentCompleted } : a
+    );
+    const updatedJournal: JournalEntry = {
+      ...selectedJournal,
+      reflection: {
+        ...selectedJournal.reflection,
+        microActions: updatedActions,
+      },
+    };
+    handleUpdateJournal(updatedJournal);
   };
 
   const handleUpdateProfile = async (updates: Partial<UserProfile>) => {
