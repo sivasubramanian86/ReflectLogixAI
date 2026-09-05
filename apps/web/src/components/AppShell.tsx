@@ -105,7 +105,7 @@ export const AppShell: React.FC<AppShellProps> = ({
     },
     {
       id: 'multimodal' as const,
-      label: t.nav.multimodal || 'Multi-Modal Media Studio',
+      label: t.nav.multimodal || 'Media Studio',
       icon: Sparkles,
       adminOnly: false,
     },

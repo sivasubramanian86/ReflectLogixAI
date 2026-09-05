@@ -15,14 +15,14 @@ export interface AuthenticatedRequest extends Request {
  */
 export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  const requestedUserId = (req.headers['x-user-id'] as string) || 'user_kailasam_001';
+  const requestedUserId = (req.headers['x-user-id'] as string) || 'user_siva_001';
 
   // Find user by userId in store
   let user = dbStore.getUser(requestedUserId);
 
   if (!user) {
     // If not found, look up admin default or create tenant profile
-    user = dbStore.getUser('user_kailasam_001');
+    user = dbStore.getUser('user_siva_001');
     if (!user) {
       user = {
         userId: requestedUserId,

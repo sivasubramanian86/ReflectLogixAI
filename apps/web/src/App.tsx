@@ -42,11 +42,196 @@ import {
   MapPin
 } from 'lucide-react';
 
+const DEFAULT_USER_PROFILE: UserProfile = {
+  userId: 'user_siva_001',
+  email: 'kailasamsiva@gmail.com',
+  displayName: 'Siva',
+  role: 'admin',
+  preferredLanguage: 'English',
+  bilingualOutput: true,
+  theme: 'dark',
+  createdTimestamp: Date.now() - 14 * 86400000,
+  lastActiveTimestamp: Date.now(),
+  longTermProfile: {
+    coreValues: ['Intellectual Curiosity', 'Mindful Resilience', 'Engineering Craftsmanship', 'Family Harmony'],
+    primaryGoals: ['Architect zero-trust Cloud Run systems', 'Maintain daily mindfulness & sleep hygiene', 'Learn Tamil literature classics'],
+    knownStressors: ['High-stakes context switching', 'Late-night architecture sprints', 'Fragmented focus'],
+    positiveAnchors: ['Morning walk in nature', 'Deep technical writing', 'Evening herbal tea with family'],
+    summary: 'Senior Cloud AI Architect striving for deep focus, calm reflection, and balanced high-performance engineering.'
+  }
+};
+
+const DEFAULT_INITIAL_JOURNALS: JournalEntry[] = [
+  {
+    id: 'entry_001',
+    userId: 'user_siva_001',
+    title: 'Dawn Reflections on Systems Architecture and Deep Work',
+    content: `Today began with crisp morning stillness. I spent the first hour sketching the ADK agent orchestration graph for the new Cloud Run deployment.
+Taking thirty seconds to pause, breathe, and ground myself before jumping into complex distributed systems logic made a world of difference.
+Goal for this evening: disconnect completely by 9 PM to preserve restorative sleep cycles.`,
+    language: 'English',
+    createdAt: Date.now() - 2 * 86400000,
+    updatedAt: Date.now() - 2 * 86400000,
+    tags: ['Architecture', 'Mindfulness', 'DeepWork', 'SleepHygiene'],
+    wordCount: 78,
+    tokenCountEstimated: 112,
+    location: {
+      placeName: 'Bangalore Tech District, KA',
+      latitude: 12.9716,
+      longitude: 77.5946,
+      privacyPrecision: 'neighborhood'
+    },
+    reflection: {
+      summary: 'Balanced morning combining systems architecture design with mindful pacing and an explicit sleep hygiene boundary.',
+      bilingualSummary: {
+        detectedLanguage: 'English',
+        originalSummary: 'Balanced morning combining systems architecture design with mindful pacing and an explicit sleep hygiene boundary.',
+        englishSummary: 'Balanced morning combining systems architecture design with mindful pacing and an explicit sleep hygiene boundary.',
+        keyPhrases: ['ADK agent graph', 'Cognitive bandwidth', 'Restorative sleep']
+      },
+      moodAnalysis: {
+        primaryMood: 'Reflective',
+        secondaryMood: 'Calm',
+        valence: 0.72,
+        arousal: 0.45,
+        stressLevel: 3,
+        tags: ['Clarity', 'Mindful Focus', 'Proactive Boundaries'],
+        sentimentScore: 0.8
+      },
+      cognitiveStrengths: ['High metacognitive awareness', 'Proactive boundary setting for recovery'],
+      reframeSuggestions: ['Acknowledge that strategic pauses accelerate system velocity rather than slowing you down.'],
+      socraticQuestions: [
+        'What physical cues tell you your bandwidth is fragmenting before it impacts your mood?',
+        'How can you replicate this calm dawn environment on high-intensity sprint days?'
+      ],
+      microActions: [
+        {
+          id: 'act_001',
+          title: '9:00 PM Screen Shutdown',
+          description: 'Transition devices to charging station away from bedside.',
+          timeframe: 'today',
+          priority: 'high',
+          completed: true
+        },
+        {
+          id: 'act_002',
+          title: 'Morning 5-Min Breathwork',
+          description: 'Perform 4-7-8 grounding breaths before checking email inbox.',
+          timeframe: 'this_week',
+          priority: 'medium',
+          completed: true
+        }
+      ],
+      longitudinalGrowth: {
+        patternDetected: 'Positive correlation between morning pauses and sustained evening cognitive energy.',
+        trendDirection: 'improving',
+        consistencyScore: 92,
+        coachNote: 'Siva, your intentional pacing is demonstrating clear compound benefits across your cognitive stamina.'
+      }
+    }
+  },
+  {
+    id: 'entry_002',
+    userId: 'user_siva_001',
+    title: '10,480 Steps Morning Clarity Walk in Nature',
+    content: `Completed a brisk 10,480 steps walk through the park at sunrise.
+Breathing in fresh air, noticing the bird calls, and feeling gratitude for good health.
+Key realization: Slowing down intentionally actually speeds up long-term architectural clarity.`,
+    language: 'English',
+    createdAt: Date.now() - 1 * 86400000,
+    updatedAt: Date.now() - 1 * 86400000,
+    tags: ['Wellness', '10kSteps', 'Gratitude', 'Mindset'],
+    wordCount: 52,
+    tokenCountEstimated: 75,
+    reflection: {
+      summary: 'Energizing sunrise walk with 10k steps and a pivotal mindset reframe on sustainable velocity.',
+      bilingualSummary: {
+        detectedLanguage: 'English',
+        originalSummary: 'Energizing sunrise walk with 10k steps and a pivotal mindset reframe on sustainable velocity.',
+        englishSummary: 'Energizing sunrise walk with 10k steps and a pivotal mindset reframe on sustainable velocity.',
+        keyPhrases: ['10k steps', 'Sunrise clarity', 'Sustainable velocity']
+      },
+      moodAnalysis: {
+        primaryMood: 'Energized',
+        secondaryMood: 'Grateful',
+        valence: 0.88,
+        arousal: 0.65,
+        stressLevel: 2,
+        tags: ['Vitality', 'Physical Wellbeing', 'Clarity'],
+        sentimentScore: 0.92
+      },
+      cognitiveStrengths: ['Physical-mental integration', 'Appreciation for restorative habits'],
+      reframeSuggestions: ['Anchor this post-walk mental clarity as your creative springboard for architecture.'],
+      socraticQuestions: [
+        'How does physical movement change the way you approach complex engineering roadblocks?',
+        'What is one small way to protect this morning walking ritual every single day?'
+      ],
+      microActions: [
+        {
+          id: 'act_003',
+          title: 'Hydrate & Electrolytes',
+          description: 'Drink 500ml water with electrolytes after morning walk.',
+          timeframe: 'today',
+          priority: 'medium',
+          completed: true
+        }
+      ]
+    }
+  },
+  {
+    id: 'entry_003',
+    userId: 'user_siva_001',
+    title: 'Important Meeting Reminder: APAC Cloud Architecture Review at 11:00 AM',
+    content: `Voice Note Reflection: Remind me about the upcoming APAC Cloud Architecture Review meeting at 11:00 AM today with the engineering leads.
+Key agenda points to highlight: zero-trust Cloud KMS envelope encryption, ADK multi-agent orchestration concurrency, and keeping our 94/100 team peace index score steady.`,
+    language: 'English',
+    createdAt: Date.now() - 4 * 3600000,
+    updatedAt: Date.now() - 4 * 3600000,
+    tags: ['MeetingReminder', 'Architecture', '11AMMeeting', 'ADK'],
+    wordCount: 65,
+    tokenCountEstimated: 95,
+    reflection: {
+      summary: 'Proactive preparation for 11:00 AM APAC Cloud Architecture Review with focus on zero-trust KMS and multi-agent concurrency.',
+      bilingualSummary: {
+        detectedLanguage: 'English',
+        originalSummary: 'Proactive preparation for 11:00 AM APAC Cloud Architecture Review with focus on zero-trust KMS and multi-agent concurrency.',
+        englishSummary: 'Proactive preparation for 11:00 AM APAC Cloud Architecture Review with focus on zero-trust KMS and multi-agent concurrency.',
+        keyPhrases: ['11 AM Meeting', 'KMS envelope encryption', 'Team peace index']
+      },
+      moodAnalysis: {
+        primaryMood: 'Inspired',
+        secondaryMood: 'Reflective',
+        valence: 0.82,
+        arousal: 0.6,
+        stressLevel: 2,
+        tags: ['Leadership', 'High Focus', 'Preparation'],
+        sentimentScore: 0.85
+      },
+      cognitiveStrengths: ['Proactive agenda setting', 'Holistic view of engineering excellence and team well-being'],
+      reframeSuggestions: ['Lead the architecture review with calm confidence — your zero-trust design is rock-solid.'],
+      socraticQuestions: [
+        'What key outcome will make the 11 AM architecture review a resounding success?',
+        'How can you ensure the team leaves the meeting feeling energized rather than drained?'
+      ],
+      microActions: [
+        {
+          id: 'act_004',
+          title: 'Review KMS Architecture Slides',
+          description: 'Double-check Cloud KMS key rotation policy before 11 AM.',
+          timeframe: 'today',
+          priority: 'high',
+          completed: false
+        }
+      ]
+    }
+  }
+];
+
 function MainAppContent() {
   const { currentLanguage } = useI18n();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [journals, setJournals] = useState<JournalEntry[]>([]);
-  const [selectedJournal, setSelectedJournal] = useState<JournalEntry | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(DEFAULT_USER_PROFILE);
+  const [journals, setJournals] = useState<JournalEntry[]>(DEFAULT_INITIAL_JOURNALS);
+  const [selectedJournal, setSelectedJournal] = useState<JournalEntry | null>(DEFAULT_INITIAL_JOURNALS[0]);
   const [knowledgeGraph, setKnowledgeGraph] = useState<KnowledgeGraphData | null>(null);
 
   const [activeTab, setActiveTab] = useState<NavigationTab>('journal');
@@ -80,21 +265,25 @@ function MainAppContent() {
 
       if (resUser.ok) {
         const userData = await resUser.json();
-        setUser(userData.user);
+        if (userData.user) {
+          setUser(userData.user);
+        }
       }
 
       if (resJournals.ok) {
         const journalData = await resJournals.json();
         const loadedJournals: JournalEntry[] = journalData.journals || [];
-        setJournals(loadedJournals);
         if (loadedJournals.length > 0) {
+          setJournals(loadedJournals);
           setSelectedJournal(loadedJournals[0]);
         }
       }
 
       if (resGraph.ok) {
         const graphData = await resGraph.json();
-        setKnowledgeGraph(graphData.graph);
+        if (graphData.graph) {
+          setKnowledgeGraph(graphData.graph);
+        }
       }
     } catch (err) {
       console.error('Failed to load initial data:', err);

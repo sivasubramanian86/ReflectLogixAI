@@ -21,7 +21,7 @@ import {
   ExternalLink,
   BookOpen
 } from 'lucide-react';
-import { useI18n } from '../i18n';
+import { useI18n, getLanguageBCP47 } from '../i18n';
 import { JournalEntry } from '../types';
 
 export interface MultiModalSample {
@@ -39,6 +39,65 @@ export interface MultiModalSample {
   recommendedAction: string;
 }
 
+export const DEFAULT_MULTIMODAL_SAMPLES: MultiModalSample[] = [
+  {
+    id: 'sample_voice_01',
+    type: 'voice_note',
+    category: 'Voice Notes & Action Items',
+    title: 'Important Meeting Reminder & Action Prep',
+    previewUrl: '/assets/sample_voice_note.wav',
+    mimeType: 'audio/wav',
+    gcsUri: 'gs://reflectlogix-media-genai-apac/voice-notes/meeting_reminder_11am.wav',
+    kmsKeyId: 'projects/genai-apac-2026/locations/asia-south1/keyRings/reflectlogix-ring/cryptoKeys/media-key',
+    extractedSnippet: 'Voice Note (1:02): Remind me about the upcoming APAC Cloud Architecture Review meeting at 11:00 AM. Prepare the zero-trust KMS diagram, verify ADK multi-agent benchmarks, and check our 10,480 steps daily health goal before the call.',
+    geminiCapability: 'Gemini 2.5 Live Audio & Emotional Prosody Analysis',
+    suggestedTags: ['VoiceNote', 'MeetingReminder', '11AMMeeting', 'Architecture'],
+    recommendedAction: 'Add calendar reminder and prepare ADK zero-trust review slides'
+  },
+  {
+    id: 'sample_sticky_01',
+    type: 'sticky_note',
+    category: 'Sticky Notes & Idea Memos',
+    title: 'ADK Agent Flow & Zero-Trust Blueprint',
+    previewUrl: '/assets/sample_sticky_note.jpg',
+    mimeType: 'image/jpeg',
+    gcsUri: 'gs://reflectlogix-media-genai-apac/sticky-notes/sticky_arch_001.jpg',
+    kmsKeyId: 'projects/genai-apac-2026/locations/asia-south1/keyRings/reflectlogix-ring/cryptoKeys/media-key',
+    extractedSnippet: 'ReflectLogixAI ADK Agent Flow -> Grounding with pgvector -> Restorative sleep by 9pm',
+    geminiCapability: 'Gemini 2.5 Flash Vision OCR & Schema Extraction',
+    suggestedTags: ['StickyNote', 'Architecture', 'ADK', 'DeepWork'],
+    recommendedAction: 'Extract architecture design and add to active sprint plan'
+  },
+  {
+    id: 'sample_handwritten_01',
+    type: 'handwritten_note',
+    category: 'Handwritten Notes & Whiteboard Scans',
+    title: 'Morning Nature Walk & Longevity Insight',
+    previewUrl: '/assets/sample_handwritten_note.jpg',
+    mimeType: 'image/jpeg',
+    gcsUri: 'gs://reflectlogix-media-genai-apac/handwritten/nature_walk_journal_scan.jpg',
+    kmsKeyId: 'projects/genai-apac-2026/locations/asia-south1/keyRings/reflectlogix-ring/cryptoKeys/media-key',
+    extractedSnippet: 'Morning clarity walk in nature: 10,480 steps completed. Breathing in gratitude, releasing context-switching fatigue. Key insight: Slow down to speed up.',
+    geminiCapability: 'Gemini 2.5 Vision Cursive Handwriting Recognition',
+    suggestedTags: ['Handwritten', '10kSteps', 'Gratitude', 'Mindset'],
+    recommendedAction: 'Synthesize biological recovery and socratic reframing'
+  },
+  {
+    id: 'sample_video_01',
+    type: 'video_log',
+    category: 'Video Reflection Logs & Mindful Vlogs',
+    title: 'Sunset Lakefront Mindful Vlog',
+    previewUrl: '/assets/sample_video_thumbnail.jpg',
+    mimeType: 'video/mp4',
+    gcsUri: 'gs://reflectlogix-media-genai-apac/video-logs/sunset_mindful_vlog_3year_horizons.mp4',
+    kmsKeyId: 'projects/genai-apac-2026/locations/asia-south1/keyRings/reflectlogix-ring/cryptoKeys/media-key',
+    extractedSnippet: 'Sunset reflection on 3-Year Life Horizons, open-source AI frameworks, and maintaining a 94/100 Peace Score.',
+    geminiCapability: 'Gemini 2.5 Multimodal Video & Scene Understanding',
+    suggestedTags: ['VideoLog', 'SunsetReflection', 'LifeHorizons', 'PeaceScore'],
+    recommendedAction: 'Track temporal mood progression and life goal milestones'
+  }
+];
+
 interface MultiModalMediaHubProps {
   onJournalCreated?: (entry: JournalEntry) => void;
   onNavigateToTimeline?: () => void;
@@ -48,38 +107,42 @@ export const MultiModalMediaHub: React.FC<MultiModalMediaHubProps> = ({
   onJournalCreated,
   onNavigateToTimeline,
 }) => {
-  const { currentLanguage } = useI18n();
-  const [samples, setSamples] = useState<MultiModalSample[]>([]);
-  const [selectedSample, setSelectedSample] = useState<MultiModalSample | null>(null);
-  const [customText, setCustomText] = useState('');
+  const { currentLanguage, t } = useI18n();
+  const [samples, setSamples] = useState<MultiModalSample[]>(DEFAULT_MULTIMODAL_SAMPLES);
+  const [selectedSample, setSelectedSample] = useState<MultiModalSample | null>(DEFAULT_MULTIMODAL_SAMPLES[0]);
+  const [customText, setCustomText] = useState(DEFAULT_MULTIMODAL_SAMPLES[0].extractedSnippet);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [copiedGcs, setCopiedGcs] = useState(false);
 
   // Audio Playback State
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const synthRef = useRef<SpeechSynthesis | null>(null);
 
   // Sticky Note Custom Color
   const [stickyColor, setStickyColor] = useState<'yellow' | 'teal' | 'rose' | 'lavender'>('yellow');
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      synthRef.current = window.speechSynthesis || null;
+    }
     fetchSamples();
   }, []);
 
   const fetchSamples = async () => {
     try {
       const res = await fetch('/api/multimodal/samples');
-      if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
         const data = await res.json();
-        setSamples(data.samples || []);
-        if (data.samples && data.samples.length > 0) {
+        if (data.samples && Array.isArray(data.samples) && data.samples.length > 0) {
+          setSamples(data.samples);
           setSelectedSample(data.samples[0]);
           setCustomText(data.samples[0].extractedSnippet);
         }
       }
     } catch (err) {
-      console.error('Failed to fetch multimodal samples:', err);
+      console.warn('Using built-in multimodal samples fallback:', err);
     }
   };
 
@@ -87,23 +150,40 @@ export const MultiModalMediaHub: React.FC<MultiModalMediaHubProps> = ({
     setSelectedSample(sample);
     setCustomText(sample.extractedSnippet);
     setAnalysisResult(null);
-    if (isPlayingAudio && audioRef.current) {
-      audioRef.current.pause();
+    if (isPlayingAudio && synthRef.current) {
+      synthRef.current.cancel();
       setIsPlayingAudio(false);
     }
   };
 
   const toggleAudioPlay = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio('/assets/sample_voice_note.wav');
-      audioRef.current.onended = () => setIsPlayingAudio(false);
-    }
+    if (!synthRef.current) return;
 
     if (isPlayingAudio) {
-      audioRef.current.pause();
+      synthRef.current.cancel();
       setIsPlayingAudio(false);
     } else {
-      audioRef.current.play().catch((e) => console.warn('Audio play error:', e));
+      synthRef.current.cancel();
+      const textToSpeak = customText || selectedSample?.extractedSnippet || 'Voice Note: Remind me about an upcoming meeting at 11 am.';
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.lang = getLanguageBCP47(currentLanguage || 'en');
+
+      const voices = synthRef.current.getVoices();
+      const targetLang = utterance.lang.toLowerCase();
+      const naturalVoice = voices.find(v => 
+        (v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0])) &&
+        (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Jenny') || v.name.includes('Samantha') || v.name.includes('Valluvar') || v.name.includes('Lekha'))
+      ) || voices.find(v => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0]));
+
+      if (naturalVoice) {
+        utterance.voice = naturalVoice;
+      }
+
+      utterance.onend = () => setIsPlayingAudio(false);
+      utterance.onerror = () => setIsPlayingAudio(false);
+      synthRef.current.speak(utterance);
       setIsPlayingAudio(true);
     }
   };

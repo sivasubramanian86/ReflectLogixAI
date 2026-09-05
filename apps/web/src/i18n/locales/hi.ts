@@ -7,7 +7,7 @@ export const hi: TranslationDictionary = {
 
   nav: {
     journal: 'मेरा जर्नल',
-    multimodal: 'मल्टी-मोडल मीडिया स्टूडियो',
+    multimodal: 'मीडिया स्टूडियो',
     healthSync: 'स्वास्थ्य और स्मार्टवॉच',
     lifestyleFlashcards: 'दीर्घायु फ्लैशकार्ड',
     lifePlanner: 'जीवन और लक्ष्य योजनाकार',
@@ -29,7 +29,7 @@ export const hi: TranslationDictionary = {
   },
 
   multimodal: {
-    title: 'मल्टी-मोडल मीडिया स्टूडियो',
+    title: 'मीडिया स्टूडियो',
     subtitle: 'स्टिकी नोट्स, हस्तलिखित नोट्स, वॉयस नोट्स और वीडियो लॉग को क्लाउड स्टोरेज में सहेजें',
     gcsBucket: 'gs://reflectlogix-media-genai-apac/',
     analyzeBtn: 'जेमिनी 2.5 मल्टी-मोडल से विश्लेषण करें',

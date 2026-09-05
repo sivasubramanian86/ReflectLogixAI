@@ -7,7 +7,7 @@ export const ta: TranslationDictionary = {
 
   nav: {
     journal: 'என் டைரி',
-    multimodal: 'மல்டி-மோடல் மீடியா ஸ்டுடியோ',
+    multimodal: 'மீடியா ஸ்டுடியோ',
     healthSync: 'உடல்நலம் & ஸ்மார்ட் வாட்ச்',
     lifestyleFlashcards: 'நீண்ட ஆயுள் அட்டைகள்',
     lifePlanner: 'வாழ்க்கை & இலக்கு திட்டமிடல்',
@@ -29,7 +29,7 @@ export const ta: TranslationDictionary = {
   },
 
   multimodal: {
-    title: 'மல்டி-மோடல் மீடியா ஸ்டுடியோ',
+    title: 'மீடியா ஸ்டுடியோ',
     subtitle: 'ஸ்டிக்கி குறிப்புகள், கையெழுத்து தாள்கள், குரல் பதிவுகள் மற்றும் வீடியோ பதிவுகளை கிளவுட் ஸ்டோரேஜில் சேமிக்கவும்',
     gcsBucket: 'gs://reflectlogix-media-genai-apac/',
     analyzeBtn: 'ஜெமினி 2.5 மல்டி-மோடல் கொண்டு ஆராய்க',

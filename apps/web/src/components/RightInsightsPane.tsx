@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { JournalEntry, ReflectionInsight } from '../types';
 
+import { useI18n } from '../i18n';
+
 interface RightInsightsPaneProps {
   selectedJournal: JournalEntry | null;
   journals?: JournalEntry[];
@@ -28,6 +30,7 @@ export const RightInsightsPane: React.FC<RightInsightsPaneProps> = ({
   onOpenLiveVoice,
   onQuickPrompt,
 }) => {
+  const { t } = useI18n();
   const reflection = selectedJournal?.reflection;
 
   const coachQuestions = reflection?.socraticQuestions || [
@@ -53,10 +56,10 @@ export const RightInsightsPane: React.FC<RightInsightsPaneProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
             <Flame className="h-4 w-4" />
-            <span>Consistency Streak</span>
+            <span>{t.insights?.activeStreak || 'Consistency Streak'}</span>
           </div>
           <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-bold">
-            8 Days
+            8 {t.insights?.streakDays || 'Days'}
           </span>
         </div>
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
@@ -68,15 +71,15 @@ export const RightInsightsPane: React.FC<RightInsightsPaneProps> = ({
       <div className="p-5 rounded-2xl glass-card border border-white/40 dark:border-white/10 space-y-3">
         <div className="flex items-center space-x-2 text-teal-600 dark:text-teal-400 font-bold text-sm">
           <TrendingUp className="h-4 w-4" />
-          <span>Mood Journey</span>
+          <span>{t.insights?.moodTrends || 'Mood Journey'}</span>
         </div>
         <div className="grid grid-cols-2 gap-2 text-center">
           <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)]">
-            <span className="text-xs text-[var(--text-muted)] font-medium">Average Ease</span>
+            <span className="text-xs text-[var(--text-muted)] font-medium">{t.insights?.avgStress || 'Average Ease'}</span>
             <div className="text-lg font-bold text-teal-700 dark:text-teal-300">7.8 / 10</div>
           </div>
           <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)]">
-            <span className="text-xs text-[var(--text-muted)] font-medium">Positive Days</span>
+            <span className="text-xs text-[var(--text-muted)] font-medium">{t.insights?.positivityRatio || 'Positive Days'}</span>
             <div className="text-lg font-bold text-teal-700 dark:text-teal-300">85%</div>
           </div>
         </div>
@@ -89,20 +92,20 @@ export const RightInsightsPane: React.FC<RightInsightsPaneProps> = ({
       <div className="p-5 rounded-2xl glass-card border border-white/40 dark:border-white/10 space-y-3.5">
         <div className="flex items-center space-x-2 text-teal-600 dark:text-teal-400 font-bold text-sm">
           <Sparkles className="h-4 w-4" />
-          <span>Reflection Coach</span>
+          <span>{t.reflection?.title || 'Reflection Coach'}</span>
         </div>
 
         {/* Top Questions */}
         <div className="space-y-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-            Curious Questions for You
+            {t.reflection?.socraticTitle || 'Curious Questions for You'}
           </span>
           <div className="space-y-1.5">
             {coachQuestions.slice(0, 3).map((q, idx) => (
               <button
                 key={idx}
                 type="button"
-                onClick={() => onQuickPrompt(q)}
+                onClick={() => onQuickPrompt && onQuickPrompt(q)}
                 className="w-full text-left p-2.5 rounded-xl bg-[var(--bg-secondary)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors focus-ring"
               >
                 "{q}"
@@ -114,7 +117,7 @@ export const RightInsightsPane: React.FC<RightInsightsPaneProps> = ({
         {/* Micro-Actions */}
         <div className="space-y-2 pt-1 border-t border-[var(--border-subtle)]">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-            Micro-Actions
+            {t.reflection?.microActionsTitle || 'Micro-Actions'}
           </span>
           <div className="space-y-1.5">
             {microActions.slice(0, 3).map((action, idx) => (

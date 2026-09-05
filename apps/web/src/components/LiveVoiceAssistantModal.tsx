@@ -41,9 +41,13 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
   isOpen,
   onClose,
   onJournalCreated,
-  preferredLanguage = 'English',
+  preferredLanguage,
   userName = 'Siva'
 }) => {
+  const { currentLanguage, t } = useI18n();
+  const activeLang = currentLanguage || 'en';
+  const bcp47Lang = getLanguageBCP47(activeLang);
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -67,7 +71,7 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = preferredLanguage === 'Tamil' ? 'ta-IN' : preferredLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
+        recognition.lang = bcp47Lang;
 
         recognition.onresult = (event: any) => {
           let transcript = '';
@@ -92,12 +96,12 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
         recognitionRef.current = recognition;
       }
     }
-  }, [preferredLanguage]);
+  }, [bcp47Lang]);
 
   // Initial Warm Welcome Greeting on Modal Open
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      const welcomeText = `Hello ${userName}! I'm Nova, your ReflectLogixAI companion. I'm connected to your memory graph, past journals, and agent mesh. How are you feeling today, or would you like me to summarize your reflections?`;
+      const welcomeText = getNovaGreeting(userName, activeLang);
       
       const welcomeMsg: ChatMessage = {
         id: `msg_${Date.now()}`,
@@ -108,7 +112,7 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
       setMessages([welcomeMsg]);
       speakText(welcomeText);
     }
-  }, [isOpen]);
+  }, [isOpen, activeLang, userName]);
 
   // Auto-scroll messages
   useEffect(() => {
@@ -119,13 +123,9 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
-      interval = setInterval(() => {
-        setAudioLevel(Math.random() * 0.7 + 0.3);
-      }, 100);
+      interval = setInterval(() => setAudioLevel(Math.random() * 0.7 + 0.3), 100);
     } else if (isListening) {
-      interval = setInterval(() => {
-        setAudioLevel(Math.random() * 0.4 + 0.1);
-      }, 150);
+      interval = setInterval(() => setAudioLevel(Math.random() * 0.4 + 0.1), 150);
     } else {
       setAudioLevel(0);
     }
@@ -144,13 +144,18 @@ export const LiveVoiceAssistantModal: React.FC<LiveVoiceAssistantModalProps> = (
       .replace(/\n+/g, ' ');
 
     const utterance = new SpeechSynthesisUtterance(cleanSpeech);
-    utterance.rate = 1.05;
+    utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    utterance.lang = preferredLanguage === 'Tamil' ? 'ta-IN' : preferredLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
+    utterance.lang = bcp47Lang;
 
-    // Pick a natural voice if available
+    // Pick a natural voice matching language if available
     const voices = synthRef.current.getVoices();
-    const naturalVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Female') || v.name.includes('Samantha')));
+    const targetLang = bcp47Lang.toLowerCase();
+    const naturalVoice = voices.find(v => 
+      (v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0])) &&
+      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Valluvar') || v.name.includes('Lekha'))
+    ) || voices.find(v => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0]));
+
     if (naturalVoice) {
       utterance.voice = naturalVoice;
     }

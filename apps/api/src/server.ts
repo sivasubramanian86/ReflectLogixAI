@@ -441,16 +441,16 @@ app.get('/api/multimodal/samples', requireAuth, (_req: AuthenticatedRequest, res
     {
       id: 'sample_voice_01',
       type: 'voice_note',
-      category: 'Voice Notes & Spoken Reflections',
-      title: 'Morning Vitality Audio Journal',
+      category: 'Voice Notes & Action Items',
+      title: 'Important Meeting Reminder & Action Prep',
       previewUrl: '/assets/sample_voice_note.wav',
       mimeType: 'audio/wav',
-      gcsUri: 'gs://reflectlogix-media-genai-apac/voice-notes/morning_vitality_audio_log.wav',
+      gcsUri: 'gs://reflectlogix-media-genai-apac/voice-notes/meeting_reminder_11am.wav',
       kmsKeyId: 'projects/genai-apac-2026/locations/asia-south1/keyRings/reflectlogix-ring/cryptoKeys/media-key',
-      extractedSnippet: 'Reflecting on balancing cognitive stamina with meeting buffers. Feeling grounded and energized after 5-minute breathwork.',
+      extractedSnippet: 'Voice Note (1:02): Remind me about the upcoming APAC Cloud Architecture Review meeting at 11:00 AM. Prepare the zero-trust KMS diagram, verify ADK multi-agent benchmarks, and check our 10,480 steps daily health goal before the call.',
       geminiCapability: 'Gemini 2.5 Live Audio & Emotional Prosody Analysis',
-      suggestedTags: ['VoiceNote', 'AudioReflect', 'Breathwork', 'Calm'],
-      recommendedAction: 'Analyze acoustic cadence and extract micro-actions'
+      suggestedTags: ['VoiceNote', 'MeetingReminder', '11AMMeeting', 'Architecture'],
+      recommendedAction: 'Add calendar reminder and prepare ADK zero-trust review slides'
     },
     {
       id: 'sample_video_01',
@@ -511,7 +511,7 @@ app.post('/api/multimodal/analyze', requireAuth, async (req: AuthenticatedReques
     } else if (mediaType === 'handwritten_note') {
       transcribedContent = `Extracted from Handwritten Journal scan:\n"Morning clarity walk in nature: 10,480 steps completed. Breathing in gratitude, releasing context-switching fatigue. Key insight: Slow down to speed up."\n\nCloud Storage Asset: ${gcsUri || 'gs://reflectlogix-media-genai-apac/handwritten/nature_walk_journal_scan.jpg'}\nSynthesized via Gemini 2.5 Flash Cursive Vision OCR with Socratic cognitive reframing.`;
     } else if (mediaType === 'voice_note') {
-      transcribedContent = `Transcribed from Voice Note recording:\n"Reflecting on balancing cognitive stamina with meeting buffers. Taking 5-minute box breathing sessions between architecture sprints keeps my focus grounded and calm."\n\nCloud Storage Asset: ${gcsUri || 'gs://reflectlogix-media-genai-apac/voice-notes/morning_vitality_audio_log.wav'}\nSynthesized via Gemini 2.5 Live Audio transcription with prosody analysis.`;
+      transcribedContent = `Transcribed from Voice Note recording (1:02 duration):\n"Voice Note: Remind me about the upcoming APAC Cloud Architecture Review meeting at 11:00 AM today with our engineering leads. Key agenda items: verify zero-trust KMS envelope encryption for Cloud Storage, benchmark ADK subagent parallelization, and hit our 10,480 daily steps goal before the afternoon architecture deep-dive."\n\nCloud Storage Asset: ${gcsUri || 'gs://reflectlogix-media-genai-apac/voice-notes/meeting_reminder_11am.wav'}\nSynthesized via Gemini 2.5 Live Audio transcription with prosody analysis and micro-action synthesis.`;
     } else if (mediaType === 'video_log') {
       transcribedContent = `Transcribed from Mindful Video Log (1:24 duration):\n"Recorded a sunset reflection by the lake. Aligning our 3-year vision with open-source multi-agent engineering while protecting deep personal peace and family wellness."\n\nCloud Storage Asset: ${gcsUri || 'gs://reflectlogix-media-genai-apac/video-logs/sunset_mindful_vlog_3year_horizons.mp4'}\nSynthesized via Gemini 2.5 Multimodal Video & Scene Understanding.`;
     } else {

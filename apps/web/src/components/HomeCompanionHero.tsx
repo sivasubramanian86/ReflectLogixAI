@@ -19,6 +19,8 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
+import { useI18n, getLanguageBCP47, getNovaGreeting } from '../i18n';
+
 interface HomeCompanionHeroProps {
   userName?: string;
   preferredLanguage?: string;
@@ -28,10 +30,14 @@ interface HomeCompanionHeroProps {
 
 export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
   userName = 'Siva',
-  preferredLanguage = 'English',
+  preferredLanguage,
   onJournalCreated,
   onOpenFullModal
 }) => {
+  const { currentLanguage, t } = useI18n();
+  const activeLangCode = currentLanguage || 'en';
+  const bcp47Lang = getLanguageBCP47(activeLangCode);
+
   const [isExpanded, setIsExpanded] = useState(true);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -40,13 +46,17 @@ export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
   const [audioLevel, setAudioLevel] = useState(0);
   const [inputText, setInputText] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(null);
-  const [liveResponse, setLiveResponse] = useState<string>(
-    `Hello ${userName}! I'm Nova, your Live 3D AI Journal Companion. Speak to me to reflect, search past memories with pgvector RAG, or generate today's daily summary.`
+  const [liveResponse, setLiveResponse] = useState<string>(() =>
+    getNovaGreeting(userName, activeLangCode)
   );
   const [toolsUsed, setToolsUsed] = useState<Array<{ name: string; description: string }>>([]);
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
+
+  useEffect(() => {
+    setLiveResponse(getNovaGreeting(userName, activeLangCode));
+  }, [activeLangCode, userName]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -57,7 +67,7 @@ export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = preferredLanguage === 'Tamil' ? 'ta-IN' : preferredLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
+        recognition.lang = bcp47Lang;
 
         recognition.onresult = (event: any) => {
           let transcript = '';
@@ -75,7 +85,7 @@ export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
         recognitionRef.current = recognition;
       }
     }
-  }, [preferredLanguage]);
+  }, [bcp47Lang]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -97,13 +107,13 @@ export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    utterance.lang = preferredLanguage === 'Tamil' ? 'ta-IN' : preferredLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
+    utterance.lang = bcp47Lang;
 
     const voices = synthRef.current.getVoices();
     const targetLang = utterance.lang.toLowerCase();
     const naturalVoice = voices.find(v => 
       (v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0])) &&
-      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Jenny') || v.name.includes('Samantha'))
+      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.name.includes('Jenny') || v.name.includes('Samantha') || v.name.includes('Valluvar') || v.name.includes('Lekha'))
     ) || voices.find(v => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(targetLang.split('-')[0]));
 
     if (naturalVoice) {

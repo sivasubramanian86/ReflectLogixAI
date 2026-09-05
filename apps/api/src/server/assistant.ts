@@ -20,6 +20,62 @@ export interface AssistantResponse {
   createdEntry?: JournalEntry;
 }
 
+export function getMultilingualFallbackGreeting(displayName: string, lang: string): string {
+  const l = (lang || '').toLowerCase();
+  if (l.includes('tamil') || l === 'ta') {
+    return `வணக்கம் ${displayName}! நான் உங்கள் நோவா (Nova) 3D AI துணைவன். உங்கள் சிந்தனைகளைப் பகிருங்கள், அல்லது கடந்த நினைவுகளைத் தேடலாம்.`;
+  }
+  if (l.includes('hindi') || l === 'hi') {
+    return `नमस्ते ${displayName}! मैं आपका नोवा (Nova) 3D एआई साथी हूँ। अपने विचार साझा करें या पिछले स्मरणों को खोजें।`;
+  }
+  if (l.includes('telugu') || l === 'te') {
+    return `నమస్కారం ${displayName}! నేను మీ నోవా (Nova) 3D AI సహచరుడిని. మీ ఆలోచనలను పంచుకోండి లేదా మునుపటి జ్ఞాపకాలను అన్వేషించండి.`;
+  }
+  if (l.includes('kannada') || l === 'kn') {
+    return `ನಮಸ್ಕಾರ ${displayName}! ನಾನು ನಿಮ್ಮ ನೋವಾ (Nova) 3D AI ಸಹವರ್ತಿ. ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ ಅಥವಾ ನೆನಪುಗಳನ್ನು ಅನ್ವೇಷಿಸಿ.`;
+  }
+  if (l.includes('malayalam') || l === 'ml') {
+    return `നമസ്കാരം ${displayName}! ഞാൻ നിങ്ങളുടെ നോവ (Nova) 3D AI കൂട്ടുകാരനാണ്. നിങ്ങളുടെ ചിന്തകൾ പങ്കിടുക.`;
+  }
+  if (l.includes('bengali') || l === 'bn') {
+    return `নমস্কার ${displayName}! আমি আপনার নোভা (Nova) 3D এআই সঙ্গী। আপনার চিন্তাভাবনা শেয়ার করুন।`;
+  }
+  if (l.includes('marathi') || l === 'mr') {
+    return `नमस्कार ${displayName}! मी तुमचा नोव्हा (Nova) 3D AI सोबती आहे. आपले विचार शेअर करा.`;
+  }
+  if (l.includes('gujarati') || l === 'gu') {
+    return `નમસ્તે ${displayName}! હું તમારો નોવા (Nova) 3D AI સાથી છું. તમારા વિચારો શેર કરો.`;
+  }
+  if (l.includes('punjabi') || l === 'pa') {
+    return `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ${displayName}! ਮੈਂ ਤੁਹਾਡਾ ਨੋਵਾ (Nova) 3D AI ਸਾਥੀ ਹਾਂ। ਆਪਣੇ ਵਿਚਾਰ ਸਾਂਝੇ ਕਰੋ।`;
+  }
+  if (l.includes('spanish') || l === 'es') {
+    return `¡Hola ${displayName}! Soy Nova, tu compañero 3D de IA en ReflectLogixAI. ¿En qué estás pensando hoy?`;
+  }
+  if (l.includes('french') || l === 'fr') {
+    return `Bonjour ${displayName} ! Je suis Nova, votre compagnon 3D IA ReflectLogixAI. Que souhaitez-vous partager aujourd'hui ?`;
+  }
+  if (l.includes('german') || l === 'de') {
+    return `Hallo ${displayName}! Ich bin Nova, dein 3D-KI-Begleiter bei ReflectLogixAI. Was liegt dir heute auf dem Herzen?`;
+  }
+  if (l.includes('japanese') || l === 'ja') {
+    return `こんにちは ${displayName}さん！ReflectLogixAIのNova 3Dです。今日の振り返りや考えを教えてください。`;
+  }
+  if (l.includes('chinese') || l.includes('mandarin') || l === 'zh') {
+    return `你好 ${displayName}！我是 ReflectLogixAI 的 Nova 3D 智能伴侣。今天有什么想法想记录或回顾吗？`;
+  }
+  if (l.includes('arabic') || l === 'ar') {
+    return `مرحباً ${displayName}! أنا نوفا، رفيقك الذكي ثلاثي الأبعاد في ReflectLogixAI. كيف يمكنني مساعدتك اليوم؟`;
+  }
+  if (l.includes('portuguese') || l === 'pt') {
+    return `Olá ${displayName}! Sou Nova, seu companheiro 3D de IA no ReflectLogixAI. O que você gostaria de refletir hoje?`;
+  }
+  if (l.includes('russian') || l === 'ru') {
+    return `Здравствуйте, ${displayName}! Я Нова, ваш 3D ИИ-спутник в ReflectLogixAI. Чем хотите поделиться сегодня?`;
+  }
+  return `Hello ${displayName}! I'm your ReflectLogixAI Nova 3D companion. I'm connected to your journal memories and ready to reflect, recall past themes, or summarize your day. What's on your mind?`;
+}
+
 /**
  * Live Virtual Assistant Service powered by Gemini 2.5 Flash
  * Provides real-time conversational intelligence, Agentic RAG,
@@ -193,13 +249,17 @@ ${subagentContext}`;
       };
     } catch (err: any) {
       console.error('[LiveAssistant] Gemini execution error:', err);
-      const fallbackMsg = `Hello ${userProfile.displayName || 'friend'}! I'm your ReflectLogixAI companion. I'm connected to your journal memories and ready to reflect, recall past themes, or summarize your day. What's on your mind?`;
+      const fallbackMsg = getMultilingualFallbackGreeting(userProfile.displayName || 'friend', preferredLanguage);
       return {
         message: fallbackMsg,
         toolsUsed,
         createdEntry
       };
     }
+  }
+
+  public static getFallbackGreeting(displayName: string, preferredLanguage = 'English'): string {
+    return getMultilingualFallbackGreeting(displayName, preferredLanguage);
   }
 
   /**
