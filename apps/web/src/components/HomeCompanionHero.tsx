@@ -27,7 +27,7 @@ interface HomeCompanionHeroProps {
 }
 
 export const HomeCompanionHero: React.FC<HomeCompanionHeroProps> = ({
-  userName = 'Sivasubramanian',
+  userName = 'Siva',
   preferredLanguage = 'English',
   onJournalCreated,
   onOpenFullModal

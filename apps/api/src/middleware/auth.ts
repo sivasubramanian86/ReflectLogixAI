@@ -23,7 +23,7 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
   req.user = {
     userId: devUserId,
     email: 'kailasamsiva@gmail.com',
-    displayName: 'Kailasam Siva',
+    displayName: 'Siva',
     role: devUserId.includes('admin') ? 'admin' : 'user',
     longTermProfile: {
       preferredLanguage: 'English',

@@ -10,7 +10,7 @@ import {
 describe('ReflectLogixAI Frontend Component & State Architecture Suite', () => {
   const sampleUser: UserProfile = {
     userId: 'usr_siva_101',
-    displayName: 'Sivasubramanian',
+    displayName: 'Siva',
     email: 'siva@example.com',
     role: 'admin',
     preferredLanguage: 'English',

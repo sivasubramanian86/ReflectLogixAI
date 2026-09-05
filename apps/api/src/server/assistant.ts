@@ -33,7 +33,7 @@ export class LiveAssistantService {
   ): Promise<AssistantResponse> {
     const userProfile = dbStore.getUser(userId) || {
       userId,
-      displayName: 'Sivasubramanian',
+      displayName: 'Siva',
       preferredLanguage: 'English',
       longTermProfile: { summary: 'Mindful Cloud Architect' }
     } as UserProfile;

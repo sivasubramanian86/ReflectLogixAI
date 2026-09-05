@@ -12,6 +12,9 @@ describe('ReflectLogixAI Frontend & Accessibility Suite', () => {
   it('validates human-centered navigation tabs and active routing state', () => {
     const validTabs = [
       'journal',
+      'health_sync',
+      'lifestyle_flashcards',
+      'life_planner',
       'insights',
       'ask_history',
       'knowledge_graph',
@@ -21,6 +24,9 @@ describe('ReflectLogixAI Frontend & Accessibility Suite', () => {
       'admin'
     ];
     expect(validTabs.includes('journal')).toBe(true);
+    expect(validTabs.includes('health_sync')).toBe(true);
+    expect(validTabs.includes('lifestyle_flashcards')).toBe(true);
+    expect(validTabs.includes('life_planner')).toBe(true);
     expect(validTabs.includes('insights')).toBe(true);
     expect(validTabs.includes('ask_history')).toBe(true);
     expect(validTabs.includes('knowledge_graph')).toBe(true);

@@ -27,7 +27,7 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
       user = {
         userId: requestedUserId,
         email: 'kailasamsiva@gmail.com',
-        displayName: 'Sivasubramanian',
+        displayName: 'Siva',
         role: 'admin',
         preferredLanguage: 'English',
         bilingualOutput: true,

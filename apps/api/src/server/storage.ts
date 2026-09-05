@@ -23,14 +23,14 @@ class FirestoreDatabaseStore {
   }
 
   private seedInitialData() {
-    const adminUserId = 'user_kailasam_001';
+    const adminUserId = 'user_siva_001';
     const adminEmail = 'kailasamsiva@gmail.com';
 
     // 1. Seed User Profile
     const adminProfile: UserProfile = {
       userId: adminUserId,
       email: adminEmail,
-      displayName: 'Sivasubramanian',
+      displayName: 'Siva',
       role: 'admin',
       preferredLanguage: 'English',
       bilingualOutput: true,

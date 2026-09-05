@@ -104,6 +104,24 @@ export const AppShell: React.FC<AppShellProps> = ({
       adminOnly: false,
     },
     {
+      id: 'health_sync' as const,
+      label: 'Health & Wearables',
+      icon: Heart,
+      adminOnly: false,
+    },
+    {
+      id: 'lifestyle_flashcards' as const,
+      label: 'Longevity Flashcards',
+      icon: Sparkles,
+      adminOnly: false,
+    },
+    {
+      id: 'life_planner' as const,
+      label: 'Life & Goals Planner',
+      icon: Compass,
+      adminOnly: false,
+    },
+    {
       id: 'insights' as const,
       label: 'Insights & Trends',
       icon: TrendingUp,
@@ -112,7 +130,7 @@ export const AppShell: React.FC<AppShellProps> = ({
     {
       id: 'ask_history' as const,
       label: 'Deep Reflections',
-      icon: Compass,
+      icon: BookOpen,
       adminOnly: false,
     },
     {

@@ -15,6 +15,9 @@ import { GeminiLiveVoiceModal } from './components/GeminiLiveVoiceModal';
 import { LiveVoiceAssistantModal } from './components/LiveVoiceAssistantModal';
 import { HomeCompanionHero } from './components/HomeCompanionHero';
 import { ArrivalModal } from './components/ArrivalModal';
+import { SmartHealthTrackerView } from './components/SmartHealthTrackerView';
+import { LifestyleFlashcardsView } from './components/LifestyleFlashcardsView';
+import { PredictiveLifePlannerView } from './components/PredictiveLifePlannerView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AboutPage } from './pages/AboutPage';
 import { FAQPage } from './pages/FAQPage';
@@ -249,7 +252,7 @@ function MainAppContent() {
             {/* 3D Virtual Voice Assistant Hero Widget */}
             <div className="max-w-4xl mx-auto w-full">
               <HomeCompanionHero
-                userName={user?.displayName || 'Sivasubramanian'}
+                userName={user?.displayName || 'Siva'}
                 preferredLanguage={user?.preferredLanguage || 'English'}
                 onJournalCreated={(newEntry) => {
                   setJournals(prev => [newEntry, ...prev]);
@@ -367,7 +370,16 @@ function MainAppContent() {
         </div>
       )}
 
-      {/* 2. INSIGHTS & TRENDS */}
+      {/* 2. SMART HEALTH & WEARABLES */}
+      {activeTab === 'health_sync' && <SmartHealthTrackerView />}
+
+      {/* 3. LIFESTYLE & LONGEVITY FLASHCARDS */}
+      {activeTab === 'lifestyle_flashcards' && <LifestyleFlashcardsView />}
+
+      {/* 4. PREDICTIVE LIFE & GOALS PLANNER */}
+      {activeTab === 'life_planner' && <PredictiveLifePlannerView />}
+
+      {/* 5. INSIGHTS & TRENDS */}
       {activeTab === 'insights' && <AnalyticsView />}
 
       {/* 3. DEEP REFLECTIONS (SEARCH HISTORY) */}

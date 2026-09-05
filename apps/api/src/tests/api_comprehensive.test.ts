@@ -12,7 +12,7 @@ describe('ReflectLogixAI Enterprise Backend & MCP Tooling Test Suite', () => {
   beforeEach(() => {
     dbStore.upsertUser({
       userId: testUserId,
-      displayName: 'Sivasubramanian Test',
+      displayName: 'Siva Test',
       email: 'siva.test@example.com',
       role: 'admin',
       preferredLanguage: 'English',
@@ -34,7 +34,7 @@ describe('ReflectLogixAI Enterprise Backend & MCP Tooling Test Suite', () => {
   it('should manage user profile and persistence correctly', () => {
     const user = dbStore.getUser(testUserId);
     expect(user).toBeDefined();
-    expect(user?.displayName).toBe('Sivasubramanian Test');
+    expect(user?.displayName).toBe('Siva Test');
     expect(user?.role).toBe('admin');
 
     const updated = dbStore.upsertUser({
