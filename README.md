@@ -177,6 +177,7 @@ gcloud run deploy reflectlogixai-journal \
   --port 3000 \
   --memory 1Gi \
   --cpu 1 \
+  --set-labels dev-tutorial=cloud-run-ai-challenge \
   --set-env-vars NODE_ENV=production,GEMINI_MODEL=gemini-3.7-flash
 ```
 
