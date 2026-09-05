@@ -2,13 +2,16 @@
 BigQuery MCP Tool Client
 Queries longitudinal emotional trends and cognitive analytics across user populations.
 """
-from typing import Dict, Any
+
+from typing import Any, Dict
+
 
 class BigQueryMCPClient:
     """
     MCP tool interface connecting to Google Cloud BigQuery.
     Executes parameterized aggregation queries for longitudinal affect, streak tracking, and sentiment trends.
     """
+
     def __init__(self, project_id: str = "genai-apac-2026-491004"):
         self.project_id = project_id
 
@@ -34,11 +37,8 @@ class BigQueryMCPClient:
             "top_themes": [
                 {"theme": "Mindfulness & Calm", "frequency": 14},
                 {"theme": "Engineering Craft", "frequency": 11},
-                {"theme": "Family Time", "frequency": 9}
+                {"theme": "Family Time", "frequency": 9},
             ],
             "query_template": query_sql,
-            "query_parameters": {
-                "user_id": user_id,
-                "days": days
-            }
+            "query_parameters": {"user_id": user_id, "days": days},
         }

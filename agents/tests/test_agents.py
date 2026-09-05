@@ -1,16 +1,19 @@
 """
 Pytest unit tests for ADK Agents and MCP Tool integrations with >95% code coverage.
 """
+
 import pytest
-from agents.orchestrator.workflow_engine import ADKWorkflowEngine
-from agents.subagents.mood_classifier.agent import MoodClassifierAgent
-from agents.subagents.reflection_coach.agent import ReflectionCoachAgent
-from agents.subagents.planner.agent import MicroActionPlannerAgent
-from agents.subagents.localization.agent import LocalizationAgent
-from agents.subagents.context_optimizer.agent import ContextOptimizerAgent
+
 from agents.mcp_tools.bigquery_mcp import BigQueryMCPClient
 from agents.mcp_tools.cloudsql_pgvector import CloudSQLPgVectorMCPClient
 from agents.mcp_tools.graphrag_neo4j import GraphRAGNeo4jMCPClient
+from agents.orchestrator.workflow_engine import ADKWorkflowEngine
+from agents.subagents.context_optimizer.agent import ContextOptimizerAgent
+from agents.subagents.localization.agent import LocalizationAgent
+from agents.subagents.mood_classifier.agent import MoodClassifierAgent
+from agents.subagents.planner.agent import MicroActionPlannerAgent
+from agents.subagents.reflection_coach.agent import ReflectionCoachAgent
+
 
 @pytest.mark.asyncio
 async def test_adk_workflow_engine_execution():
@@ -18,12 +21,9 @@ async def test_adk_workflow_engine_execution():
     sample_entry = {
         "id": "test_1",
         "title": "A day of clarity",
-        "content": "Felt very grateful for the progress made today on the project and the evening walk with family."
+        "content": "Felt very grateful for the progress made today on the project and the evening walk with family.",
     }
-    user_profile = {
-        "userId": "user_siva_001",
-        "preferredLanguage": "English"
-    }
+    user_profile = {"userId": "user_siva_001", "preferredLanguage": "English"}
 
     result = await engine.execute_dag(sample_entry, user_profile)
 
@@ -36,9 +36,10 @@ async def test_adk_workflow_engine_execution():
     assert result["dag_metadata"]["engine"] == "Google ADK Orchestrator v3.1"
     assert engine.project_id == "genai-apac-2026-491004"
 
+
 def test_mood_classifier_branches():
     classifier = MoodClassifierAgent()
-    
+
     # Overwhelmed branch
     res_overwhelm = classifier.classify_affect("I feel anxious, panic, and completely burned out with exhaustion.")
     assert res_overwhelm["primaryMood"] == "Overwhelmed"
@@ -66,12 +67,17 @@ def test_mood_classifier_branches():
     assert res_reflective["primaryMood"] == "Reflective"
     assert res_reflective["stressLevel"] == 3
 
+
 def test_reflection_coach():
     coach = ReflectionCoachAgent()
-    coaching = coach.generate_socratic_coaching("High pressure meeting sprint.", {"stressLevel": 7, "primaryMood": "Overwhelmed"})
+    coaching = coach.generate_socratic_coaching(
+        "High pressure meeting sprint.",
+        {"stressLevel": 7, "primaryMood": "Overwhelmed"},
+    )
     assert "inquiry" in coaching
     assert len(coaching["inquiry"]) >= 2
     assert len(coaching["cognitiveStrengths"]) > 0
+
 
 def test_micro_action_planner():
     planner = MicroActionPlannerAgent()
@@ -80,14 +86,15 @@ def test_micro_action_planner():
     assert actions[0]["category"] in ["REST", "PRODUCTIVITY", "WELLNESS", "HABIT"]
     assert actions[0]["completed"] is False
 
+
 def test_localization_agent_multilingual():
     localizer = LocalizationAgent()
-    
+
     # Tamil
     res_ta = localizer.localize_reflection("Calm and centered reflection.", "Tamil (தமிழ்)")
     assert "சிந்தனை" in res_ta["originalSummary"]
     assert res_ta["detectedLanguage"] == "Tamil (தமிழ்)"
-    
+
     # Hindi
     res_hi = localizer.localize_reflection("Calm and centered reflection.", "Hindi (हिन्दी)")
     assert "चिंतन" in res_hi["originalSummary"]
@@ -103,23 +110,33 @@ def test_localization_agent_multilingual():
     assert res_en["detectedLanguage"] == "English"
     assert res_en["originalSummary"] == "Calm and centered reflection."
 
+
 def test_context_optimizer():
     optimizer = ContextOptimizerAgent()
-    
+
     # Non-empty history
-    summary = optimizer.compress_history([
-        {"tags": ["DeepWork", "Architecture"], "reflection": {"moodAnalysis": {"primaryMood": "Reflective"}}},
-        {"tags": ["Wellness"], "reflection": {"moodAnalysis": {"primaryMood": "Calm"}}}
-    ])
+    summary = optimizer.compress_history(
+        [
+            {
+                "tags": ["DeepWork", "Architecture"],
+                "reflection": {"moodAnalysis": {"primaryMood": "Reflective"}},
+            },
+            {
+                "tags": ["Wellness"],
+                "reflection": {"moodAnalysis": {"primaryMood": "Calm"}},
+            },
+        ]
+    )
     assert "Context Summary" in summary
 
     # Empty history
     empty_summary = optimizer.compress_history([])
     assert "No previous history recorded." in empty_summary
-    
+
     budget = optimizer.estimate_token_budget("Sample journal content for budget calculation.")
     assert budget["estimatedTokens"] > 0
     assert budget["compressionRatio"] == 0.68
+
 
 def test_bigquery_mcp_client():
     bq = BigQueryMCPClient()
@@ -128,11 +145,13 @@ def test_bigquery_mcp_client():
     assert "average_stress" in metrics
     assert len(metrics["top_themes"]) > 0
 
+
 def test_pgvector_mcp_client():
     client = CloudSQLPgVectorMCPClient()
     results = client.similarity_search("user_siva_001", "deep architecture focus", top_k=2)
     assert len(results) > 0
     assert results[0]["similarityScore"] > 0.5
+
 
 def test_graphrag_mcp_client():
     client = GraphRAGNeo4jMCPClient()

@@ -2,13 +2,16 @@
 Context Optimizer & Semantic Cache Subagent
 Compresses historical journals into dense prompt context, eliminating redundant tokens.
 """
-from typing import Dict, Any, List
+
+from typing import Any, Dict, List
+
 
 class ContextOptimizerAgent:
     """
     Subagent that prunes and condenses rolling conversational and journal history.
     Reduces prompt token payload while preserving psychological state and emotional context.
     """
+
     def __init__(self, max_context_tokens: int = 4000):
         self.max_context_tokens = max_context_tokens
 
@@ -16,10 +19,10 @@ class ContextOptimizerAgent:
         """Extracts key themes, emotional vectors, and active goals from past entries."""
         if not history_entries:
             return "No previous history recorded."
-        
+
         themes = set()
         mood_counts: Dict[str, int] = {}
-        
+
         for e in history_entries[:10]:
             for t in e.get("tags", []):
                 themes.add(t)
@@ -29,7 +32,7 @@ class ContextOptimizerAgent:
 
         dominant_mood = max(mood_counts, key=mood_counts.get) if mood_counts else "Balanced"
         theme_str = ", ".join(list(themes)[:6]) if themes else "General Reflection"
-        
+
         return (
             f"Context Summary: {len(history_entries)} prior entries analyzed. "
             f"Dominant Affect: {dominant_mood}. "
@@ -43,5 +46,5 @@ class ContextOptimizerAgent:
         return {
             "wordCount": word_count,
             "estimatedTokens": estimated_tokens,
-            "compressionRatio": 0.68
+            "compressionRatio": 0.68,
         }

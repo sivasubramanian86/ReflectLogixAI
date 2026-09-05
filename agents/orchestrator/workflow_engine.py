@@ -2,23 +2,31 @@
 ReflectLogixAI ADK Multi-Agent Orchestrator
 Coordinates parallel and sequential subagent DAG execution for journal analysis.
 """
-import os
+
 import asyncio
-from typing import Dict, Any, List
-from agents.subagents.context_optimizer.agent import ContextOptimizerAgent
-from agents.subagents.mood_classifier.agent import MoodClassifierAgent
-from agents.subagents.reflection_coach.agent import ReflectionCoachAgent
-from agents.subagents.planner.agent import MicroActionPlannerAgent
-from agents.subagents.localization.agent import LocalizationAgent
+import hashlib
+import os
+import time
+from typing import Any, Dict, List
+
 from agents.mcp_tools.graphrag_neo4j import GraphRAGNeo4jMCPClient
+from agents.subagents.context_optimizer.agent import ContextOptimizerAgent
+from agents.subagents.localization.agent import LocalizationAgent
+from agents.subagents.mood_classifier.agent import MoodClassifierAgent
+from agents.subagents.planner.agent import MicroActionPlannerAgent
+from agents.subagents.reflection_coach.agent import ReflectionCoachAgent
+
 
 class ADKWorkflowEngine:
     """
     Master Directed Acyclic Graph (DAG) Orchestration Engine for ReflectLogixAI.
     Coordinates 5 specialized subagents across parallel and sequential branches.
     """
+
     def __init__(self, gemini_api_key: str = None, project_id: str = None, location: str = None):
-        self.use_vertex_ai = os.getenv("USE_VERTEX_AI", "true").lower() == "true" or bool(os.getenv("GOOGLE_CLOUD_PROJECT"))
+        self.use_vertex_ai = os.getenv("USE_VERTEX_AI", "true").lower() == "true" or bool(
+            os.getenv("GOOGLE_CLOUD_PROJECT")
+        )
         self.project_id = project_id or os.getenv("GOOGLE_CLOUD_PROJECT", "genai-apac-2026-491004")
         self.location = location or os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
         self.api_key = gemini_api_key or os.getenv("GEMINI_API_KEY")
@@ -28,6 +36,11 @@ class ADKWorkflowEngine:
         self.action_planner = MicroActionPlannerAgent()
         self.localization_agent = LocalizationAgent()
         self.graph_client = GraphRAGNeo4jMCPClient()
+        self._session_cache: Dict[str, Dict[str, Any]] = {}
+
+    def _make_cache_key(self, user_id: str, entry_id: str, content: str, lang: str) -> str:
+        raw = f"{user_id}:{entry_id}:{content.strip()}:{lang}"
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
     async def execute_dag(self, journal_entry: Dict[str, Any], user_profile: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -38,14 +51,19 @@ class ADKWorkflowEngine:
         Stage 4: Action Planning & Goal Decomposition
         Stage 5: Multilingual Localization & Policy Check
         """
-        start_time = asyncio.get_event_loop().time()
-        
-        # Stage 1: Context Optimization
         content = journal_entry.get("content", "")
         entry_id = journal_entry.get("id", "temp_id")
         user_id = user_profile.get("userId", "default_user")
         preferred_lang = user_profile.get("preferredLanguage", "English")
-        
+
+        cache_key = self._make_cache_key(user_id, entry_id, content, preferred_lang)
+        if cache_key in self._session_cache:
+            cached_entry = self._session_cache[cache_key]
+            if time.time() - cached_entry.get("timestamp", 0) < 900:  # 15 min TTL
+                return cached_entry.get("data", {})
+
+        start_time = asyncio.get_event_loop().time()
+
         # Stage 2: Parallel Branch (Mood Classification + Thematic Extraction)
         mood_task = self._run_mood_analysis(content)
         themes_task = self._run_thematic_extraction(content)
@@ -58,16 +76,13 @@ class ADKWorkflowEngine:
         actions_res = await self._run_action_planning(content, coach_res, themes_res)
 
         # Stage 5: Multilingual Localization
-        localized_res = self.localization_agent.localize_reflection(
-            coach_res.get("summary", ""),
-            preferred_lang
-        )
+        localized_res = self.localization_agent.localize_reflection(coach_res.get("summary", ""), preferred_lang)
 
         end_time = asyncio.get_event_loop().time()
         execution_time_ms = int((end_time - start_time) * 1000)
 
         # Final Compiled Output
-        return {
+        result = {
             "summary": coach_res.get("summary", ""),
             "bilingualSummary": localized_res,
             "moodAnalysis": mood_res,
@@ -89,10 +104,18 @@ class ADKWorkflowEngine:
                     "ThematicExtractor",
                     "ReflectionCoach",
                     "MicroActionPlanner",
-                    "LocalizationAgent"
-                ]
-            }
+                    "LocalizationAgent",
+                ],
+            },
         }
+
+        # Cache result with eviction when cache exceeds 20 entries
+        if len(self._session_cache) > 20:
+            oldest_key = next(iter(self._session_cache))
+            del self._session_cache[oldest_key]
+        self._session_cache[cache_key] = {"timestamp": time.time(), "data": result}
+
+        return result
 
     async def _run_mood_analysis(self, content: str) -> Dict[str, Any]:
         """Classify emotional valence, arousal, and stress scores."""
@@ -115,32 +138,39 @@ class ADKWorkflowEngine:
         return themes or ["Reflective Awareness", "Daily Pacing"]
 
     async def _run_reflection_coaching(
-        self, content: str, mood: Dict[str, Any], themes: List[str], user_profile: Dict[str, Any]
+        self,
+        content: str,
+        mood: Dict[str, Any],
+        themes: List[str],
+        user_profile: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Run Socratic coaching, cognitive reframing, and strengths identification."""
         await asyncio.sleep(0.03)
         coaching = self.reflection_coach.generate_socratic_coaching(content, mood)
-        
+
         # Summary derived from tone & themes
         summary = (
             f"You demonstrated thoughtful self-awareness in navigating daily challenges, "
             f"connecting {themes[0] if themes else 'reflection'} with intentional habits."
         )
-        
+
         return {
             "summary": summary,
             "cognitiveStrengths": [
                 "Metacognitive clarity under pressure",
                 "Constructive problem reframing",
-                "Value-aligned habit anchoring"
+                "Value-aligned habit anchoring",
             ],
             "reframeSuggestions": [
                 "Notice that taking strategic pauses strengthens focus rather than delaying output."
             ],
-            "socraticQuestions": coaching.get("inquiry", [
-                "What core signal indicated it was time to step back and re-center?",
-                "How can you recreate this environment for tomorrow's highest priority task?"
-            ])
+            "socraticQuestions": coaching.get(
+                "inquiry",
+                [
+                    "What core signal indicated it was time to step back and re-center?",
+                    "How can you recreate this environment for tomorrow's highest priority task?",
+                ],
+            ),
         }
 
     async def _run_action_planning(

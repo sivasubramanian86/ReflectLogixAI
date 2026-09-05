@@ -2,13 +2,16 @@
 Mood & Affect Classifier Subagent
 Extracts Russell's Circumplex affect coordinates (valence, arousal) and stress scores.
 """
-from typing import Dict, Any
+
+from typing import Any, Dict
+
 
 class MoodClassifierAgent:
     """
     Subagent that maps natural language text into 2D continuous affective space
     (Valence: -1.0 to +1.0, Arousal: 0.0 to 1.0) and discrete stress intensity (1 to 10).
     """
+
     def __init__(self, model_name: str = "gemini-2.5-flash"):
         self.model_name = model_name
 
@@ -16,7 +19,7 @@ class MoodClassifierAgent:
         """Classify emotional state using affective lexicon and semantic patterns."""
         lower = text.lower()
         keywords = []
-        
+
         # Heuristic scoring
         if any(w in lower for w in ["anxious", "panic", "overwhelm", "burnout", "exhausted"]):
             primary = "Overwhelmed"
@@ -62,5 +65,5 @@ class MoodClassifierAgent:
             "stressLevel": stress,
             "keywords": keywords,
             "confidence": 0.95,
-            "affectModel": "Russell_Circumplex_v2"
+            "affectModel": "Russell_Circumplex_v2",
         }

@@ -1,0 +1,26 @@
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=agents --cov-fail-under=100 --cov-report=term-missing"
+testpaths = [
+    "agents/tests",
+]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["agents"]
+omit = [
+    "agents/tests/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 100
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]

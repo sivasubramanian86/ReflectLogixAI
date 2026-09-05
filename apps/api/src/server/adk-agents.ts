@@ -21,6 +21,48 @@ import {
  * - Branch 4 (Sequential): Cost & Context Optimizer Subagent
  */
 
+interface CachedWorkflowItem {
+  timestamp: number;
+  result: { reflection: ReflectionInsight; workflowExecution: ADKWorkflowExecution };
+}
+
+export class WorkflowSessionCache {
+  private static cache = new Map<string, CachedWorkflowItem>();
+  private static readonly TTL_MS = 15 * 60 * 1000; // 15-minute deduplication window
+
+  public static makeKey(userId: string, entryId: string, content: string, targetLanguage: string): string {
+    const raw = `${userId}:${entryId}:${content.trim()}:${targetLanguage}`;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = (hash << 5) - hash + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return `wf_cache_${Math.abs(hash).toString(36)}`;
+  }
+
+  public static get(key: string): { reflection: ReflectionInsight; workflowExecution: ADKWorkflowExecution } | null {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    if (Date.now() - item.timestamp > this.TTL_MS) {
+      this.cache.delete(key);
+      return null;
+    }
+    return item.result;
+  }
+
+  public static set(key: string, result: { reflection: ReflectionInsight; workflowExecution: ADKWorkflowExecution }): void {
+    if (this.cache.size > 500) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, { timestamp: Date.now(), result });
+  }
+
+  public static clear(): void {
+    this.cache.clear();
+  }
+}
+
 export class ADKOrchestrationEngine {
   public static async executeJournalWorkflow(
     userId: string,
@@ -28,6 +70,12 @@ export class ADKOrchestrationEngine {
     targetLanguage = 'English',
     bilingualEnabled = true
   ): Promise<{ reflection: ReflectionInsight; workflowExecution: ADKWorkflowExecution }> {
+    const cacheKey = WorkflowSessionCache.makeKey(userId, entry.id, entry.content, targetLanguage);
+    const cached = WorkflowSessionCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const userProfile = dbStore.getUser(userId);
     const executionId = `wf_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const workflowStartTime = Date.now();
@@ -118,7 +166,10 @@ export class ADKOrchestrationEngine {
 
     dbStore.recordWorkflowExecution(userId, workflowExecution);
 
-    return { reflection, workflowExecution };
+    const result = { reflection, workflowExecution };
+    WorkflowSessionCache.set(cacheKey, result);
+
+    return result;
   }
 
   // --- Subagent 1: Summarization and Reflection ---
