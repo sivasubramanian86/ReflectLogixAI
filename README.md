@@ -60,6 +60,15 @@ ReflectLogixAI organizes your holistic well-being and journaling into dedicated,
 ### 8. 📊 Insights & Trends
 - **Longitudinal Affect Trajectories**: BigQuery rollup analytics calculating active consistency streaks, mood shift velocity, and stress mitigation patterns.
 
+### 9. 🌐 18-Language Dynamic Localization (Indian & Global)
+- **Zero-Latency Dynamic Switching**: Seamlessly adapts FAQ, About principles, reflection timeline cards, Socratic prompts, and Gemini responses across 18 native languages:
+  - **Indian Languages:** Tamil (தமிழ்), Hindi (हिन्दी), Telugu (తెలుగు), Kannada (ಕನ್ನಡ), Malayalam (മലയാളം), Bengali (বাংলা), Marathi (मराठी), Gujarati (ગુજરાતી), Punjabi (ਪੰਜਾਬੀ).
+  - **Global Languages:** English, Spanish (Español), French (Français), German (Deutsch), Japanese (日本語), Mandarin Chinese (中文), Arabic (العربية), Portuguese (Português), Russian (Русский).
+
+### 10. 🎙️ 5-Minute Demo Video & Voiceover Asset
+- **Synthesized Demo Track**: Full 5-minute energetic voiceover (`reflectlogix_demo_voiceover.mp3`) covering the complete prompt-to-production lifecycle.
+- **Storyboard & Timestamps**: Complete scene-by-scene script documented in [`youtube_demo_script.md`](youtube_demo_script.md).
+
 ---
 
 ## 🔒 Zero-Trust Security & DevSecOps
