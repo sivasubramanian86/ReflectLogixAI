@@ -47,6 +47,11 @@ ENV/
 # System & Editor
 .DS_Store
 Thumbs.db
+# Media & Demo Audio (kept local only)
+*.mp3
+*.wav
+*.m4a
+*.ogg
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
