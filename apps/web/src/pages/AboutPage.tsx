@@ -14,9 +14,12 @@ import {
   Lock
 } from 'lucide-react';
 import { useI18n } from '../i18n';
+import { getLocalizedPageContent } from '../i18n/pageContent';
 
 export const AboutPage: React.FC = () => {
   const { t, currentLanguage } = useI18n();
+  const pageData = getLocalizedPageContent(currentLanguage);
+  const about = pageData.about;
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-4 sm:p-6 lg:p-8 space-y-6 w-full max-w-7xl mx-auto">
@@ -29,10 +32,10 @@ export const AboutPage: React.FC = () => {
           <span>{t.nav?.about || 'About ReflectLogixAI'}</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] relative z-10">
-          Welcome to ReflectLogixAI
+          {about.welcomeTitle}
         </h1>
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-3xl relative z-10">
-          {t.appSubtitle || 'Your Multi-Purpose Personal Gemini Journal & Socratic Life Companion'} — a calm, zero-trust sanctuary designed to help you pause, reflect with clarity, and navigate life with self-compassion and actionable momentum.
+          {about.welcomeDesc}
         </p>
       </div>
 
@@ -43,9 +46,9 @@ export const AboutPage: React.FC = () => {
           <div className="h-10 w-10 rounded-xl bg-teal-500/15 flex items-center justify-center text-teal-600 dark:text-teal-400">
             <Brain className="h-5 w-5" />
           </div>
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">Socratic Reflection Coaching</h2>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">{about.principles.socraticTitle}</h2>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-            Multi-agent cognitive reframing powered by Gemini 3.7 & 2.5 Flash, identifying cognitive distortions and synthesizing 15-minute high-impact micro-actions.
+            {about.principles.socraticDesc}
           </p>
         </div>
 
@@ -54,9 +57,9 @@ export const AboutPage: React.FC = () => {
           <div className="h-10 w-10 rounded-xl bg-indigo-500/15 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
             <Layers className="h-5 w-5" />
           </div>
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">Multi-Modal Media Studio</h2>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">{about.principles.mediaTitle}</h2>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-            Seamlessly capture Sticky Notes, Handwritten journal scans, 1-Minute voice memos, and video reflection logs stored securely in Google Cloud Storage.
+            {about.principles.mediaDesc}
           </p>
         </div>
 
@@ -65,9 +68,9 @@ export const AboutPage: React.FC = () => {
           <div className="h-10 w-10 rounded-xl bg-rose-500/15 flex items-center justify-center text-rose-600 dark:text-rose-400">
             <Heart className="h-5 w-5" />
           </div>
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">Smart Wearable Biometrics</h2>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">{about.principles.healthTitle}</h2>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-            Correlate daily journal valence with resting heart rate, HRV, deep sleep stages, and step counts via Health Connect, Samsung Health, Apple HealthKit, and Garmin.
+            {about.principles.healthDesc}
           </p>
         </div>
 
@@ -76,9 +79,9 @@ export const AboutPage: React.FC = () => {
           <div className="h-10 w-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
             <Lock className="h-5 w-5" />
           </div>
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">Zero-Trust Privacy & Cloud Run</h2>
+          <h2 className="text-lg font-bold text-[var(--text-primary)]">{about.principles.privacyTitle}</h2>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-            User-isolated Firestore security rules, Google Cloud Secret Manager vaulting, and ephemeral Detox Mode ensure total personal data sovereignty.
+            {about.principles.privacyDesc}
           </p>
         </div>
       </div>
@@ -88,11 +91,11 @@ export const AboutPage: React.FC = () => {
         <div className="flex items-center space-x-2.5 text-teal-600 dark:text-teal-400">
           <Globe2 className="h-5 w-5" />
           <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
-            18-Language Internationalization
+            {about.multilingualTitle}
           </h2>
         </div>
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-          ReflectLogixAI provides native conversational and reflective capabilities across Tamil, Hindi, Telugu, Kannada, Malayalam, Bengali, Marathi, Gujarati, Punjabi, Arabic, French, German, Spanish, Portuguese, Russian, Japanese, Chinese, and English with dynamic voice synthesis.
+          {about.multilingualDesc}
         </p>
       </div>
     </div>

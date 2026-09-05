@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Search, BookOpen, Calendar, ArrowRight, Lightbulb, Compass, Loader2 } from 'lucide-react';
 import { useI18n } from '../i18n';
+import { getLocalizedPageContent } from '../i18n/pageContent';
 
 interface DeepReflectionsProps {
   onSelectEntry?: (entryId: string) => void;
@@ -8,17 +9,15 @@ interface DeepReflectionsProps {
 
 export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }) => {
   const { t, currentLanguage } = useI18n();
+  const pageData = getLocalizedPageContent(currentLanguage);
+  const rag = pageData.rag;
+
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const samplePrompts = [
-    "What moments brought me the most calm and clarity recently?",
-    "How did I handle stress or burnout during busy weeks?",
-    "What goals or personal habits did I celebrate achieving?",
-    "What are the recurring themes in my thoughts about growth?"
-  ];
+  const samplePrompts = rag.examplePrompts;
 
   const handleSearch = async (searchPrompt?: string) => {
     const q = searchPrompt || query;
@@ -41,36 +40,24 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
         const data = await res.json();
         setSearchResults(data.results || []);
       } else {
-        setSearchResults([
-          {
-            entryId: 'entry_1',
-            title: 'Reflections on Sustainable Pacing',
-            snippet: 'Taking intentional morning pauses transformed how I handled high workload demands with calm focus.',
-            similarityScore: 0.94,
-            matchedTags: ['Mindfulness', 'Work', 'Calm'],
-            date: 'Yesterday'
-          },
-          {
-            entryId: 'entry_2',
-            title: 'Evening Walk & Cognitive Rest',
-            snippet: 'Disconnecting from screens after dinner brought immediate mental relief and restorative sleep.',
-            similarityScore: 0.88,
-            matchedTags: ['Health', 'Rest', 'Habits'],
-            date: '3 days ago'
-          }
-        ]);
+        setSearchResults(rag.sampleResults.map((r, i) => ({
+          entryId: `entry_${i + 1}`,
+          title: r.title,
+          snippet: r.snippet,
+          similarityScore: i === 0 ? 0.94 : 0.88,
+          matchedTags: r.tags,
+          date: r.date
+        })));
       }
     } catch {
-      setSearchResults([
-        {
-          entryId: 'entry_1',
-          title: 'Reflections on Sustainable Pacing',
-          snippet: 'Taking intentional morning pauses transformed how I handled high workload demands with calm focus.',
-          similarityScore: 0.94,
-          matchedTags: ['Mindfulness', 'Work', 'Calm'],
-          date: 'Yesterday'
-        }
-      ]);
+      setSearchResults(rag.sampleResults.map((r, i) => ({
+        entryId: `entry_${i + 1}`,
+        title: r.title,
+        snippet: r.snippet,
+        similarityScore: i === 0 ? 0.94 : 0.88,
+        matchedTags: r.tags,
+        date: r.date
+      })));
     } finally {
       setIsSearching(false);
     }
@@ -88,10 +75,10 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
             <span>{t.nav?.agenticRag || 'Deep Reflections'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            {t.nav?.agenticRag || 'Deep Reflections'} • Semantic Memory RAG
+            {rag.title}
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-            Query your historical reflections via Cloud SQL pgvector cosine similarity to surface past breakthroughs and emotional insights.
+            {rag.subtitle}
           </p>
 
           {/* Search Input */}
@@ -109,7 +96,7 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t.timeline?.searchPlaceholder || 'Search thoughts, tags, themes or questions...'}
+                  placeholder={rag.searchPlaceholder}
                   className="w-full pl-11 pr-4 py-3 rounded-2xl glass-input focus-ring text-sm"
                 />
               </div>
@@ -121,12 +108,12 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
                 {isSearching ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Searching Memories...</span>
+                    <span>{rag.searchingBtn}</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    <span>Search History</span>
+                    <span>{rag.searchBtn}</span>
                   </>
                 )}
               </button>
@@ -139,7 +126,7 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
       <div className="space-y-3">
         <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
           <Lightbulb className="h-4 w-4 text-amber-500" />
-          <span>Example Inquiry Prompts</span>
+          <span>{rag.examplePromptsTitle}</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {samplePrompts.map((prompt, idx) => (
@@ -164,7 +151,7 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-[var(--text-primary)] flex items-center space-x-2">
             <BookOpen className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-            <span>Retrieved Memory Results ({searchResults.length})</span>
+            <span>{rag.resultsTitle} ({searchResults.length})</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,7 +165,7 @@ export const AgenticRagView: React.FC<DeepReflectionsProps> = ({ onSelectEntry }
                     {result.title}
                   </h3>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 font-semibold shrink-0">
-                    {Math.round(result.similarityScore * 100)}% match
+                    {Math.round(result.similarityScore * 100)}% {rag.matchSuffix}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">

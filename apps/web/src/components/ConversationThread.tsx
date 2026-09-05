@@ -12,7 +12,7 @@ export const ConversationThread: React.FC<ConversationThreadProps> = ({
   journal,
   onUpdateJournal,
 }) => {
-  const { t } = useI18n();
+  const { t, currentLanguage } = useI18n();
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -37,7 +37,7 @@ export const ConversationThread: React.FC<ConversationThreadProps> = ({
       const res = await fetch(`/api/journals/${journal.id}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText }),
+        body: JSON.stringify({ message: userText, language: currentLanguage }),
       });
 
       if (res.ok) {
@@ -53,11 +53,23 @@ export const ConversationThread: React.FC<ConversationThreadProps> = ({
     }
   };
 
-  const sampleQuestions = [
-    'How can I break down my top micro-action today?',
-    'Why did this situation trigger stress for me?',
-    'What cognitive reframe can help me stay calm and centered?',
-  ];
+  const sampleQuestions = currentLanguage === 'ta'
+    ? [
+        'இன்றைய எனது முக்கிய நுண்ணிய செயலை எவ்வாறு தொடங்குவது?',
+        'இந்த சூழல் எனக்கு ஏன் மன அழுத்தத்தை ஏற்படுத்தியது?',
+        'மனதை அமைதியாக வைக்க உதவும் நேர்மறை சிந்தனை எது?'
+      ]
+    : currentLanguage === 'hi'
+    ? [
+        'आज के मुख्य कार्य को मैं कैसे शुरू करूँ?',
+        'इस स्थिति ने मुझे तनाव क्यों दिया?',
+        'मन को शांत रखने के लिए क्या सकारात्मक दृष्टिकोण हो सकता है?'
+      ]
+    : [
+        'How can I break down my top micro-action today?',
+        'Why did this situation trigger stress for me?',
+        'What cognitive reframe can help me stay calm and centered?'
+      ];
 
   return (
     <section

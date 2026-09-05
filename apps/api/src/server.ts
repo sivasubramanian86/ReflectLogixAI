@@ -168,10 +168,11 @@ app.post('/api/journals', requireAuth, async (req: AuthenticatedRequest, res: Re
   // Automatically trigger ADK Multi-Agent Orchestration if requested
   if (autoAnalyze !== false) {
     try {
+      const targetLang = language || req.user?.preferredLanguage || 'English';
       const { reflection, workflowExecution } = await ADKOrchestrationEngine.executeJournalWorkflow(
         userId,
         newEntry,
-        req.user?.preferredLanguage || 'English',
+        targetLang,
         req.user?.bilingualOutput ?? true
       );
 
@@ -288,7 +289,7 @@ app.post('/api/journals/:id/action-toggle', requireAuth, (req: AuthenticatedRequ
 app.post('/api/journals/:id/chat', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user!.userId;
   const entry = dbStore.getJournalById(userId, req.params.id);
-  const { message } = req.body;
+  const { message, language } = req.body;
 
   if (!entry) {
     return res.status(404).json({ error: 'Journal entry not found.' });
@@ -297,6 +298,8 @@ app.post('/api/journals/:id/chat', requireAuth, async (req: AuthenticatedRequest
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     return res.status(400).json({ error: 'Chat message is required.' });
   }
+
+  const targetLang = language || entry.language || req.user?.preferredLanguage || 'English';
 
   // 1. Append User message
   dbStore.addChatMessage(userId, entry.id, {
@@ -311,6 +314,7 @@ app.post('/api/journals/:id/chat', requireAuth, async (req: AuthenticatedRequest
     try {
       const ai = getGeminiClient();
       const prompt = `You are ReflectLogix Coach, an empathetic, insightful Socratic coach for personal reflection.
+Language Requirement: Respond warmly, fluently and naturally in ${targetLang}.
 User Profile: ${JSON.stringify(req.user?.longTermProfile || {})}
 Journal Entry Title: "${entry.title}"
 Journal Entry Content: "${entry.content}"
@@ -333,14 +337,22 @@ Provide a warm, supportive, and Socratic response (2-4 sentences). Help the user
   }
 
   if (!coachReply) {
-    // Intelligent contextual response
-    const fallbacks = [
-      `I hear what you're saying. When you notice those feelings arising, what is one gentle boundary you can set today to protect your energy?`,
-      `That is a profound observation. Connecting your personal anchors with daily decisions often unlocks greater clarity. How might you approach this with self-compassion?`,
-      `Thank you for sharing that nuance. Breaking this into a 5-minute micro-step could ease the cognitive load. What would feel like the most natural starting point?`,
-      `Reflecting on that shows strong self-awareness. What would success look like for you if you gave yourself permission to pause?`
-    ];
-    coachReply = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    const langLower = targetLang.toLowerCase();
+    if (langLower.includes('tamil') || langLower === 'ta') {
+      coachReply = 'உங்கள் சிந்தனையைப் பகிர்ந்தமைக்கு நன்றி. இந்த சூழலில் உங்கள் மன அமைதியைப் பாதுகாக்க நீங்கள் எடுக்கக்கூடிய எளிய முடிவு என்ன?';
+    } else if (langLower.includes('hindi') || langLower === 'hi') {
+      coachReply = 'अपने विचार साझा करने के लिए धन्यवाद। इस स्थिति में अपनी ऊर्जा को संतुलित रखने के लिए आप क्या छोटा कदम उठा सकते हैं?';
+    } else if (langLower.includes('telugu') || langLower === 'te') {
+      coachReply = 'మీ ఆలోచనలను పంచుకున్నందుకు ధన్యవాదాలు. మీ మనశ్శాంతిని కాపాడుకోవడానికి మీరు తీసుకోగల చిన్న నిర్ణయం ఏమిటి?';
+    } else {
+      const fallbacks = [
+        `I hear what you're saying. When you notice those feelings arising, what is one gentle boundary you can set today to protect your energy?`,
+        `That is a profound observation. Connecting your personal anchors with daily decisions often unlocks greater clarity. How might you approach this with self-compassion?`,
+        `Thank you for sharing that nuance. Breaking this into a 5-minute micro-step could ease the cognitive load. What would feel like the most natural starting point?`,
+        `Reflecting on that shows strong self-awareness. What would success look like for you if you gave yourself permission to pause?`
+      ];
+      coachReply = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    }
   }
 
   // 3. Append Coach reply

@@ -102,7 +102,7 @@ export class ADKOrchestrationEngine {
 
     // PARALLEL EXECUTION: Subagent 1 (Summarization) + Subagent 2 (Mood Classification)
     const [summaryResult, moodResult] = await Promise.all([
-      this.runSummarizationAgent(entry, userProfile),
+      this.runSummarizationAgent(entry, userProfile, targetLanguage),
       this.runMoodClassificationAgent(entry)
     ]);
 
@@ -111,7 +111,7 @@ export class ADKOrchestrationEngine {
     totalTokensConsumed += summaryResult.stepTrace.tokensConsumed.total + moodResult.stepTrace.tokensConsumed.total;
 
     // SEQUENTIAL STEP 3: Action Planning & Coaching Subagent
-    const actionPlanResult = await this.runActionPlannerAgent(entry, summaryResult.summary, moodResult.moodAnalysis);
+    const actionPlanResult = await this.runActionPlannerAgent(entry, summaryResult.summary, moodResult.moodAnalysis, targetLanguage);
     steps.push(actionPlanResult.stepTrace);
     totalTokensConsumed += actionPlanResult.stepTrace.tokensConsumed.total;
 
@@ -159,9 +159,10 @@ export class ADKOrchestrationEngine {
       completedAt: Date.now(),
       totalDurationMs: totalDuration,
       status: 'completed',
-      totalTokens: totalTokensConsumed,
-      estimatedCostUsd: Number((totalTokensConsumed * 0.0000015).toFixed(6)),
-      steps
+      totalTokensConsumed,
+      estimatedCostUSD: totalTokensConsumed * 0.00000015,
+      steps,
+      cachedResponse: false
     };
 
     dbStore.recordWorkflowExecution(userId, workflowExecution);
@@ -175,7 +176,8 @@ export class ADKOrchestrationEngine {
   // --- Subagent 1: Summarization and Reflection ---
   private static async runSummarizationAgent(
     entry: JournalEntry,
-    userProfile?: UserProfile
+    userProfile?: UserProfile,
+    targetLanguage = 'English'
   ): Promise<{
     summary: string;
     cognitiveStrengths: string[];
@@ -192,28 +194,68 @@ User Profile Background: "${userProfile?.longTermProfile?.summary || 'Productive
 
 Journal Title: "${entry.title}"
 Journal Content: "${entry.content}"
+Target Output Language: "${targetLanguage}"
 Location: "${entry.location?.placeName || 'Unspecified'}"
 Attachments: "${(entry.attachments || []).map(a => `${a.type}: ${a.name}`).join(', ') || 'None'}"
 
+Language Requirement: You MUST provide all responses (summary, cognitiveStrengths, reframeSuggestions, socraticQuestions, keyThemes) naturally and fluently in ${targetLanguage}.
+
 Respond in strict JSON with the following keys:
 {
-  "summary": "1-2 concise, compassionate, deeply accurate sentences summarizing the emotional core and context.",
-  "cognitiveStrengths": ["Strength 1", "Strength 2"],
-  "reframeSuggestions": ["Constructive reframe or positive perspective shift."],
-  "socraticQuestions": ["Thought-provoking question 1?", "Insightful question 2?"],
+  "summary": "1-2 concise, compassionate, deeply accurate sentences summarizing the emotional core and context in ${targetLanguage}.",
+  "cognitiveStrengths": ["Strength 1 in ${targetLanguage}", "Strength 2 in ${targetLanguage}"],
+  "reframeSuggestions": ["Constructive reframe or positive perspective shift in ${targetLanguage}."],
+  "socraticQuestions": ["Thought-provoking question 1 in ${targetLanguage}?", "Insightful question 2 in ${targetLanguage}?"],
   "keyThemes": ["Theme1", "Theme2", "Theme3"]
 }`;
 
-    let summary = 'A thoughtful reflection navigating day-to-day demands with intentional self-awareness.';
-    let cognitiveStrengths = ['High introspective honesty', 'Grounding in personal values'];
-    let reframeSuggestions = ['Recognize incremental progress even amid demanding schedules.'];
-    let socraticQuestions = [
-      'What core value was most actively tested in this experience?',
-      'How can you design your environment to support your desired state of mind tomorrow?'
-    ];
-    let keyThemes = ['Mindful Intentionality', 'Emotional Balance', 'Pacing'];
+    const isTamil = targetLanguage.toLowerCase().includes('tamil') || targetLanguage === 'ta';
+    const isHindi = targetLanguage.toLowerCase().includes('hindi') || targetLanguage === 'hi';
+    const isTelugu = targetLanguage.toLowerCase().includes('telugu') || targetLanguage === 'te';
+
+    let summary = isTamil
+      ? 'அன்றாட சவால்களை ஆழ்ந்த விழிப்புணர்வு மற்றும் சுய அமைதியுடன் கையாளும் சிந்தனைமிக்க பதிவு.'
+      : isHindi
+      ? 'दैनिक चुनौतियों को आत्म-जागरूकता और आंतरिक शांति के साथ संभालने वाला विचारशील प्रतिबिंब।'
+      : isTelugu
+      ? 'రోజువారీ సవాళ్లను స్వీయ అవகாహన మరియు అంతర్గత ప్రశాంతతతో నిర్వహించే ఆలోచనాత్మక ప్రతిబింబం.'
+      : 'A thoughtful reflection navigating day-to-day demands with intentional self-awareness.';
+
+    let cognitiveStrengths = isTamil
+      ? ['உயர் சுய நேர்மை', 'தனிப்பட்ட கொள்கைகளில் நிலைத்தன்மை']
+      : isHindi
+      ? ['उच्च आत्म-ईमानदारी', 'व्यक्तिगत मूल्यों में स्थिरता']
+      : ['High introspective honesty', 'Grounding in personal values'];
+
+    let reframeSuggestions = isTamil
+      ? ['அழுத்தமான சூழலிலும் உங்கள் சீரான முன்னேற்றத்தை அங்கீகரித்து மன அமைதி காத்திடுங்கள்.']
+      : isHindi
+      ? ['व्यस्त समय में भी अपनी निरंतर प्रगति को पहचानें और मानसिक शांति बनाए रखें।']
+      : ['Recognize incremental progress even amid demanding schedules.'];
+
+    let socraticQuestions = isTamil
+      ? [
+          'இந்த அனுபவத்தில் உங்கள் எந்த முக்கிய கொள்கை சோதிக்கப்பட்டது?',
+          'நாளைய உங்கள் மன அமைதியை காக்க இன்றே என்ன சூழலை உருவாக்கலாம்?'
+        ]
+      : isHindi
+      ? [
+          'इस अनुभव में आपके किस मुख्य मूल्य की सबसे अधिक परीक्षा हुई?',
+          'कल की मानसिक शांति का समर्थन करने के लिए आप आज क्या कदम उठा सकते हैं?'
+        ]
+      : [
+          'What core value was most actively tested in this experience?',
+          'How can you design your environment to support your desired state of mind tomorrow?'
+        ];
+
+    let keyThemes = isTamil
+      ? ['மன விழிப்புணர்வு', 'உணர்ச்சி சமநிலை', 'வளர்ச்சி']
+      : isHindi
+      ? ['सचेत इरादा', 'भावनात्मक संतुलन', 'प्रगति']
+      : ['Mindful Intentionality', 'Emotional Balance', 'Pacing'];
+
     let tokenCount = 380;
-    let reasoning = 'Extracted semantic themes from text, identified metacognitive markers and emotional boundaries.';
+    let reasoning = `Extracted semantic themes from text for ${targetLanguage}, identified metacognitive markers and emotional boundaries.`;
 
     if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'dummy-key') {
       try {
@@ -370,23 +412,26 @@ Respond in strict JSON:
   private static async runActionPlannerAgent(
     entry: JournalEntry,
     summary: string,
-    mood: MoodAnalysis
+    mood: MoodAnalysis,
+    targetLanguage = 'English'
   ): Promise<{ microActions: MicroAction[]; stepTrace: ADKAgentTraceStep }> {
     const startTime = Date.now();
     const ai = getGeminiClient();
     const prompt = `You are the ADK Action Planning & Habit Coaching Subagent.
 Generate 2-3 realistic, high-impact micro-actions for the user based on their reflection and mood.
+Language Requirement: You MUST formulate action titles and descriptions fluently in ${targetLanguage}.
 
 Summary: "${summary}"
 Primary Mood: "${mood.primaryMood}", Stress Level: ${mood.stressLevel}/10
 Journal Content: "${entry.content}"
+Target Output Language: "${targetLanguage}"
 
 Respond in strict JSON:
 {
   "microActions": [
     {
-      "title": "Clear action title",
-      "description": "1 sentence specific how-to instructions.",
+      "title": "Clear action title in ${targetLanguage}",
+      "description": "1 sentence specific how-to instructions in ${targetLanguage}.",
       "timeframe": "today" | "this_week" | "habitual",
       "priority": "low" | "medium" | "high",
       "category": "wellness" | "productivity" | "mindset" | "relationship" | "rest"
@@ -394,26 +439,84 @@ Respond in strict JSON:
   ]
 }`;
 
-    let microActions: MicroAction[] = [
-      {
-        id: `act_${Date.now()}_1`,
-        title: '3-Minute Mindful Reset',
-        description: 'Step away from screens for 3 minutes of unhurried natural breathing.',
-        timeframe: 'today',
-        priority: 'high',
-        completed: false,
-        category: 'wellness'
-      },
-      {
-        id: `act_${Date.now()}_2`,
-        title: 'Evening Digital Sunset',
-        description: 'Switch off notification alerts 45 minutes prior to sleep.',
-        timeframe: 'this_week',
-        priority: 'medium',
-        completed: false,
-        category: 'rest'
-      }
-    ];
+    const isTamil = targetLanguage.toLowerCase().includes('tamil') || targetLanguage === 'ta';
+    const isHindi = targetLanguage.toLowerCase().includes('hindi') || targetLanguage === 'hi';
+    const isTelugu = targetLanguage.toLowerCase().includes('telugu') || targetLanguage === 'te';
+
+    let microActions: MicroAction[] = isTamil
+      ? [
+          {
+            id: `act_${Date.now()}_1`,
+            title: '3 நிமிட விழிப்புணர்வு சுவாசம்',
+            description: 'திரையிலிருந்து விலகி 3 நிமிடங்கள் மெதுவான மூச்சுப் பயிற்சி செய்யுங்கள்.',
+            timeframe: 'today',
+            priority: 'high',
+            completed: false,
+            category: 'wellness'
+          },
+          {
+            id: `act_${Date.now()}_2`,
+            title: 'இரவு டிஜிட்டல் அமைதி',
+            description: 'தூங்குவதற்கு 45 நிமிடங்களுக்கு முன் தொலைபேசி அறிவிப்புகளை முடக்குங்கள்.',
+            timeframe: 'this_week',
+            priority: 'medium',
+            completed: false,
+            category: 'rest'
+          }
+        ]
+      : isHindi
+      ? [
+          {
+            id: `act_${Date.now()}_1`,
+            title: '3-मिनट का माइंडफुल रीसेट',
+            description: 'स्क्रीन से 3 मिनट के लिए दूर रहें और सहज प्राकृतिक सांस लें।',
+            timeframe: 'today',
+            priority: 'high',
+            completed: false,
+            category: 'wellness'
+          },
+          {
+            id: `act_${Date.now()}_2`,
+            title: 'शाम का डिजिटल सूर्यास्त',
+            description: 'सोने से 45 मिनट पहले फोन के नोटिफिकेशन बंद करें।',
+            timeframe: 'this_week',
+            priority: 'medium',
+            completed: false,
+            category: 'rest'
+          }
+        ]
+      : isTelugu
+      ? [
+          {
+            id: `act_${Date.now()}_1`,
+            title: '3 నిమిషాల మైండ్‌ఫుల్ రీసెట్',
+            description: 'స్క్రీన్‌ల నుండి 3 నిమిషాల పాటు విశ్రాంతి తీసుకోండి.',
+            timeframe: 'today',
+            priority: 'high',
+            completed: false,
+            category: 'wellness'
+          }
+        ]
+      : [
+          {
+            id: `act_${Date.now()}_1`,
+            title: '3-Minute Mindful Reset',
+            description: 'Step away from screens for 3 minutes of unhurried natural breathing.',
+            timeframe: 'today',
+            priority: 'high',
+            completed: false,
+            category: 'wellness'
+          },
+          {
+            id: `act_${Date.now()}_2`,
+            title: 'Evening Digital Sunset',
+            description: 'Switch off notification alerts 45 minutes prior to sleep.',
+            timeframe: 'this_week',
+            priority: 'medium',
+            completed: false,
+            category: 'rest'
+          }
+        ];
 
     let tokenCount = 280;
 

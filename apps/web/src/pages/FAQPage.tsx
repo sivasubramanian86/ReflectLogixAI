@@ -1,43 +1,16 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ShieldCheck, Sparkles, Mic, Lock, HeartHandshake, Brain, Layers, Watch } from 'lucide-react';
 import { useI18n } from '../i18n';
+import { getLocalizedPageContent } from '../i18n/pageContent';
 
 export const FAQPage: React.FC = () => {
   const { t, currentLanguage } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const faqs = [
-    {
-      q: "How does the Socratic Reflection Coach work?",
-      a: "The Reflection Coach utilizes Google Gemini 3.7 / 2.5 Flash and the Google Agent Development Kit (ADK) to perform cognitive reframing. Rather than giving unsolicited advice, it poses deep Socratic questions, validates your cognitive strengths, and synthesizes 15-minute actionable micro-steps.",
-      icon: Brain
-    },
-    {
-      q: "How does the Media Studio process multi-modal inputs?",
-      a: "You can upload sticky notes, handwritten notebook scans, 1-minute voice memos, or video logs. Everything is stored securely in Google Cloud Storage (gs://reflectlogix-media-genai-apac/) and analyzed by Gemini 2.5 Multi-Modal OCR and audio transcription to automatically produce reflective journal entries.",
-      icon: Layers
-    },
-    {
-      q: "Is my reflection and health data private and secure?",
-      a: "Yes, completely. ReflectLogixAI enforces zero-trust tenant isolation with Cloud Firestore security rules (request.auth.uid == userId). Your data is never shared with third parties or used to train foundation models. You can also enable Detox Mode for ephemeral sessions with zero data retention.",
-      icon: ShieldCheck
-    },
-    {
-      q: "How does Smart Health & Wearables synchronization work?",
-      a: "ReflectLogixAI integrates with Google Health Connect, Apple Health, Samsung Health, and Garmin. It correlates physiological metrics (Resting Heart Rate, HRV, REM/Deep sleep stages, daily steps) with subjective journal emotional valence to identify burnout triggers early.",
-      icon: Watch
-    },
-    {
-      q: "How do I interact with Nova Live 3D Voice Assistant?",
-      a: "Click the floating Nova assistant orb in the bottom-right corner or the Live Voice button. Nova features dynamic 18-language voice synthesis, real-time waveform visualization, and hands-free spoken journaling.",
-      icon: Mic
-    },
-    {
-      q: "Can I journal in languages other than English?",
-      a: "Yes! ReflectLogixAI supports 18 languages: English, Tamil, Hindi, Telugu, Kannada, Malayalam, Bengali, Marathi, Gujarati, Punjabi, Arabic, French, German, Spanish, Portuguese, Russian, Japanese, and Chinese.",
-      icon: Sparkles
-    }
-  ];
+  const pageData = getLocalizedPageContent(currentLanguage);
+  const faqs = pageData.faqs;
+
+  const icons = [Brain, Layers, ShieldCheck, Watch, Mic, Sparkles];
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-4 sm:p-6 lg:p-8 space-y-6 w-full max-w-7xl mx-auto">
@@ -61,7 +34,7 @@ export const FAQPage: React.FC = () => {
       <div className="space-y-3" role="region" aria-label="FAQ Accordion">
         {faqs.map((faq, idx) => {
           const isOpen = openIndex === idx;
-          const Icon = faq.icon;
+          const Icon = icons[idx % icons.length] || HelpCircle;
           return (
             <div
               key={idx}

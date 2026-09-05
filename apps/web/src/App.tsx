@@ -25,6 +25,7 @@ import { AboutPage } from './pages/AboutPage';
 import { FAQPage } from './pages/FAQPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LanguageProvider, useI18n } from './i18n';
+import { getLocalizedPageContent } from './i18n/pageContent';
 import { ThemeProvider } from './context/ThemeContext';
 import {
   UserProfile,
@@ -263,6 +264,76 @@ function MainAppContent() {
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    const pageData = getLocalizedPageContent(currentLanguage);
+    const sampleMap = pageData.sampleJournals;
+    if (sampleMap) {
+      setJournals((prev) =>
+        prev.map((j) => {
+          const localized = sampleMap[j.id];
+          if (!localized) return j;
+          return {
+            ...j,
+            title: localized.title,
+            content: localized.content,
+            reflection: j.reflection
+              ? {
+                  ...j.reflection,
+                  summary: localized.summary,
+                  bilingualSummary: {
+                    detectedLanguage: currentLanguage === 'ta' ? 'Tamil (தமிழ்)' : currentLanguage === 'hi' ? 'Hindi (हिन्दी)' : 'English',
+                    originalSummary: localized.summary,
+                    englishSummary: DEFAULT_INITIAL_JOURNALS.find((d) => d.id === j.id)?.reflection?.summary || localized.summary,
+                    keyPhrases: localized.keyThemes
+                  },
+                  socraticQuestions: localized.socraticQuestions,
+                  reframeSuggestions: localized.reframeSuggestions,
+                  cognitiveStrengths: localized.cognitiveStrengths,
+                  keyThemes: localized.keyThemes,
+                  microActions: j.reflection.microActions.map((act, idx) => ({
+                    ...act,
+                    title: localized.microActions[idx]?.title || act.title,
+                    description: localized.microActions[idx]?.description || act.description,
+                  }))
+                }
+              : undefined
+          };
+        })
+      );
+      setSelectedJournal((prev) => {
+        if (!prev) return prev;
+        const localized = sampleMap[prev.id];
+        if (!localized) return prev;
+        return {
+          ...prev,
+          title: localized.title,
+          content: localized.content,
+          reflection: prev.reflection
+            ? {
+                ...prev.reflection,
+                summary: localized.summary,
+                bilingualSummary: {
+                  detectedLanguage: currentLanguage === 'ta' ? 'Tamil (தமிழ்)' : currentLanguage === 'hi' ? 'Hindi (हिन्दी)' : 'English',
+                  originalSummary: localized.summary,
+                  englishSummary: DEFAULT_INITIAL_JOURNALS.find((d) => d.id === prev.id)?.reflection?.summary || localized.summary,
+                  keyPhrases: localized.keyThemes
+                },
+                socraticQuestions: localized.socraticQuestions,
+                reframeSuggestions: localized.reframeSuggestions,
+                cognitiveStrengths: localized.cognitiveStrengths,
+                keyThemes: localized.keyThemes,
+                microActions: prev.reflection.microActions.map((act, idx) => ({
+                  ...act,
+                  title: localized.microActions[idx]?.title || act.title,
+                  description: localized.microActions[idx]?.description || act.description,
+                }))
+              }
+            : undefined
+        };
+      });
+    }
+  }, [currentLanguage]);
 
   const fetchInitialData = async () => {
     try {
