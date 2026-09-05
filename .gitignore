@@ -52,6 +52,12 @@ Thumbs.db
 *.wav
 *.m4a
 *.ogg
+
+# Local GCP Diagnostics Scripts (kept local only)
+check_gcp_health.*
+scripts/check_gcp_health.*
+scripts/*.sh
+
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json

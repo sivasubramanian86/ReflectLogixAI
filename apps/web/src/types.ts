@@ -181,6 +181,9 @@ export interface ADKWorkflowExecution {
   status: 'running' | 'completed' | 'failed';
   totalTokens: number;
   estimatedCostUsd: number;
+  totalTokensConsumed?: number;
+  estimatedCostUSD?: number;
+  cachedResponse?: boolean;
   steps: ADKAgentTraceStep[];
 }
 

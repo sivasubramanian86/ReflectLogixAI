@@ -159,6 +159,8 @@ export class ADKOrchestrationEngine {
       completedAt: Date.now(),
       totalDurationMs: totalDuration,
       status: 'completed',
+      totalTokens: totalTokensConsumed,
+      estimatedCostUsd: Number((totalTokensConsumed * 0.0000015).toFixed(6)),
       totalTokensConsumed,
       estimatedCostUSD: totalTokensConsumed * 0.00000015,
       steps,
