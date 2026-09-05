@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Globe, Moon, Sun, Bell, Shield, Heart, Save, Check } from 'lucide-react';
+import { Settings, Globe, Moon, Sun, Bell, Shield, Heart, Save, Check, Sparkles } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { useTheme } from '../context/ThemeContext';
 import { UserProfile } from '../types';
@@ -15,10 +15,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   onUpdateProfile,
   onOpenNotifications,
 }) => {
-  const { currentLanguage, setLanguage, supportedLanguages } = useI18n();
+  const { t, currentLanguage, setLanguage, supportedLanguages } = useI18n();
   const { theme, toggleTheme } = useTheme();
 
-  const [displayName, setDisplayName] = useState(user?.displayName || 'Reflective Journaler');
+  const [displayName, setDisplayName] = useState(user?.displayName || 'Siva');
   const [bilingualOutput, setBilingualOutput] = useState(user?.bilingualOutput ?? true);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -34,28 +34,30 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   };
 
   return (
-    <div className="flex-1 h-full overflow-y-auto p-4 sm:p-8 space-y-8 max-w-4xl mx-auto">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[var(--bg-surface)] p-4 sm:p-6 lg:p-8 space-y-6 w-full max-w-7xl mx-auto">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 text-xs font-semibold">
+      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-white/40 dark:border-white/10 shadow-lg relative overflow-hidden space-y-2">
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-gradient-to-br from-teal-500/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 text-xs font-semibold relative z-10">
           <Settings className="h-4 w-4" />
-          <span>Preferences & Space Configuration</span>
+          <span>{t.nav?.settings || 'Settings'}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-          Settings & Preferences
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)] relative z-10">
+          {t.nav?.settings || 'Settings'} & Preferences
         </h1>
-        <p className="text-base sm:text-lg text-[var(--text-secondary)]">
-          Customize your reflection sanctuary, language, theme, and privacy preferences.
+        <p className="text-xs sm:text-sm text-[var(--text-secondary)] relative z-10">
+          Customize your reflection sanctuary, preferred language, theme, and privacy preferences.
         </p>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-4">
         {/* Profile Card */}
-        <div className="p-6 rounded-2xl glass-card space-y-4">
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">Personal Profile</h2>
+        <div className="p-5 sm:p-6 rounded-2xl glass-card border border-white/40 dark:border-white/10 space-y-4">
+          <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">Personal Profile</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label htmlFor="display-name" className="text-sm font-semibold text-[var(--text-secondary)]">
+              <label htmlFor="display-name" className="text-xs sm:text-sm font-semibold text-[var(--text-secondary)]">
                 Display Name
               </label>
               <input
@@ -63,16 +65,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl glass-input focus-ring text-base"
+                className="w-full px-4 py-2.5 rounded-xl glass-input focus-ring text-sm"
                 placeholder="Your name"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-[var(--text-secondary)]">
+              <label className="text-xs sm:text-sm font-semibold text-[var(--text-secondary)]">
                 Account Role
               </label>
-              <div className="px-4 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-sm font-medium text-[var(--text-secondary)] flex items-center justify-between">
-                <span>{user?.role === 'admin' ? 'Workspace Admin' : 'Personal Journaler'}</span>
+              <div className="px-4 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs sm:text-sm font-medium text-[var(--text-secondary)] flex items-center justify-between min-h-[42px]">
+                <span>{user?.role === 'admin' ? (t.nav?.roleAdmin || 'Admin View') : (t.nav?.roleUser || 'User View')}</span>
                 <span className="text-xs px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-700 dark:text-teal-300 font-semibold uppercase">
                   {user?.role || 'user'}
                 </span>
@@ -82,83 +84,88 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </div>
 
         {/* Language & Output Preferences */}
-        <div className="p-6 rounded-2xl glass-card space-y-4">
+        <div className="p-5 sm:p-6 rounded-2xl glass-card border border-white/40 dark:border-white/10 space-y-4">
           <div className="flex items-center space-x-2.5">
             <Globe className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">Language & Internationalization</h2>
+            <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">Language & Internationalization</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)]">
-                Preferred Reflection Language
+              <label htmlFor="language-select" className="text-xs sm:text-sm font-semibold text-[var(--text-secondary)]">
+                {t.nav?.language || 'Preferred Reflection Language'} (18 Languages)
               </label>
               <select
                 id="language-select"
                 value={currentLanguage}
                 onChange={(e) => setLanguage(e.target.value as any)}
-                className="w-full px-4 py-2.5 rounded-xl glass-input focus-ring text-base"
+                className="w-full px-4 py-2.5 rounded-xl glass-input focus-ring text-sm"
               >
                 {supportedLanguages.map((lang) => (
                   <option key={lang.code} value={lang.code} className="bg-[var(--bg-surface)] text-[var(--text-primary)]">
-                    {lang.name} ({lang.nativeName})
+                    {lang.flag} {lang.name} ({lang.nativeName})
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] mt-auto">
-              <div className="space-y-0.5 pr-2">
-                <span className="text-sm font-semibold text-[var(--text-primary)]">Bilingual Reflection Output</span>
-                <p className="text-xs text-[var(--text-muted)]">Show translation side-by-side with original text</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={bilingualOutput}
-                onChange={(e) => setBilingualOutput(e.target.checked)}
-                className="h-5 w-5 rounded-md accent-teal-600 focus-ring"
-                aria-label="Toggle bilingual reflection output"
-              />
+            <div className="space-y-1.5 flex flex-col justify-end">
+              <label className="flex items-center space-x-3 p-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={bilingualOutput}
+                  onChange={(e) => setBilingualOutput(e.target.checked)}
+                  className="rounded text-teal-600 focus:ring-teal-500 h-4 w-4"
+                />
+                <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)]">
+                  Enable Bilingual Summaries (Native + English)
+                </span>
+              </label>
             </div>
           </div>
         </div>
 
-        {/* Theme & Aesthetics */}
-        <div className="p-6 rounded-2xl glass-card space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2.5">
-              {theme === 'dark' ? (
-                <Moon className="h-5 w-5 text-amber-400" />
-              ) : (
-                <Sun className="h-5 w-5 text-amber-600" />
-              )}
-              <h2 className="text-lg font-bold text-[var(--text-primary)]">Appearance & Color Theme</h2>
+        {/* Theme & Notifications */}
+        <div className="p-5 sm:p-6 rounded-2xl glass-card border border-white/40 dark:border-white/10 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="space-y-1">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">Appearance Mode</h3>
+              <p className="text-xs text-[var(--text-muted)]">
+                Switch between Midnight Dark and Natural Warm themes.
+              </p>
             </div>
             <button
               type="button"
               onClick={toggleTheme}
-              className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-primary)] text-sm font-medium text-[var(--text-primary)] focus-ring flex items-center space-x-2"
+              className="px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs font-semibold flex items-center space-x-2 hover:bg-[var(--bg-surface)] transition-colors focus-ring cursor-pointer"
             >
-              <span>Switch to {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
+              {theme === 'dark' ? (
+                <>
+                  <Moon className="h-4 w-4 text-indigo-400" />
+                  <span>Dark Mode</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="h-4 w-4 text-amber-500" />
+                  <span>Warm Mode</span>
+                </>
+              )}
             </button>
           </div>
-        </div>
 
-        {/* Notification Integration */}
-        <div className="p-6 rounded-2xl glass-card space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2.5">
-              <Bell className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-              <div>
-                <h2 className="text-lg font-bold text-[var(--text-primary)]">Notification Channels</h2>
-                <p className="text-xs sm:text-sm text-[var(--text-muted)]">Configure optional Slack, Discord, or email check-in alerts</p>
-              </div>
+          <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between flex-wrap gap-4">
+            <div className="space-y-1">
+              <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">Digest Notifications</h3>
+              <p className="text-xs text-[var(--text-muted)]">
+                Configure daily reflection prompts and weekly insight digests.
+              </p>
             </div>
             <button
               type="button"
               onClick={onOpenNotifications}
-              className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium focus-ring"
+              className="px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs font-semibold flex items-center space-x-2 hover:bg-[var(--bg-surface)] transition-colors focus-ring cursor-pointer"
             >
-              Manage Alerts
+              <Bell className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+              <span>Configure Alerts</span>
             </button>
           </div>
         </div>
@@ -166,14 +173,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         {/* Save Button */}
         <div className="flex items-center justify-end space-x-3 pt-2">
           {savedSuccess && (
-            <div className="flex items-center space-x-1.5 text-teal-600 dark:text-teal-400 text-sm font-semibold animate-in fade-in">
+            <span className="inline-flex items-center space-x-1.5 text-xs font-bold text-teal-700 dark:text-teal-400 bg-teal-500/10 px-3 py-1.5 rounded-xl">
               <Check className="h-4 w-4" />
-              <span>Preferences saved successfully!</span>
-            </div>
+              <span>Preferences Saved Successfully</span>
+            </span>
           )}
           <button
             type="submit"
-            className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base shadow-sm focus-ring"
+            className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold shadow-xs focus-ring flex items-center space-x-2 transition-all cursor-pointer"
           >
             <Save className="h-4 w-4" />
             <span>Save Preferences</span>
