@@ -185,4 +185,34 @@ describe('ReflectLogixAI Enterprise Backend & MCP Tooling Test Suite', () => {
     expect(rateCheck.allowed).toBe(true);
     expect(rateCheck.remaining).toBe(99);
   });
+
+  // 7. Multi-Modal Ingestion & Cloud Storage Verification
+  it('should store and retrieve multimodal journal attachments with GCS URIs', () => {
+    const entry = dbStore.createJournal(testUserId, {
+      title: 'Sticky Note Architecture Test',
+      content: 'Extracted from physical sticky note on desk.',
+      language: 'English',
+      tags: ['MultiModal', 'StickyNote'],
+      wordCount: 7,
+      tokenCountEstimated: 10,
+      attachments: [
+        {
+          id: 'att_test_01',
+          type: 'image',
+          name: 'sample_sticky_note.jpg',
+          mimeType: 'image/jpeg',
+          dataUrl: '/assets/sample_sticky_note.jpg',
+          transcription: 'ReflectLogixAI ADK Agent Flow',
+          uploadedAt: Date.now()
+        }
+      ]
+    });
+
+    expect(entry.attachments).toBeDefined();
+    expect(entry.attachments!.length).toBe(1);
+    expect(entry.attachments![0].mimeType).toBe('image/jpeg');
+
+    const retrieved = dbStore.getJournalById(testUserId, entry.id);
+    expect(retrieved?.attachments?.[0].name).toBe('sample_sticky_note.jpg');
+  });
 });

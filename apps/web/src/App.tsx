@@ -18,6 +18,7 @@ import { ArrivalModal } from './components/ArrivalModal';
 import { SmartHealthTrackerView } from './components/SmartHealthTrackerView';
 import { LifestyleFlashcardsView } from './components/LifestyleFlashcardsView';
 import { PredictiveLifePlannerView } from './components/PredictiveLifePlannerView';
+import { MultiModalMediaHub } from './components/MultiModalMediaHub';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AboutPage } from './pages/AboutPage';
 import { FAQPage } from './pages/FAQPage';
@@ -370,7 +371,18 @@ function MainAppContent() {
         </div>
       )}
 
-      {/* 2. SMART HEALTH & WEARABLES */}
+      {/* 2. MULTI-MODAL MEDIA STUDIO */}
+      {activeTab === 'multimodal' && (
+        <MultiModalMediaHub
+          onJournalCreated={(newEntry) => {
+            setJournals((prev) => [newEntry, ...prev.filter((j) => j.id !== newEntry.id)]);
+            setSelectedJournal(newEntry);
+          }}
+          onNavigateToTimeline={() => setActiveTab('journal')}
+        />
+      )}
+
+      {/* 3. SMART HEALTH & WEARABLES */}
       {activeTab === 'health_sync' && <SmartHealthTrackerView />}
 
       {/* 3. LIFESTYLE & LONGEVITY FLASHCARDS */}

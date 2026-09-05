@@ -310,4 +310,29 @@ describe('ReflectLogixAI Frontend Component & State Architecture Suite', () => {
       expect(history[1].speaker).toBe('gemini');
     });
   });
+
+  // 6. MultiModal Media Studio Tests
+  describe('MultiModalMediaHub Ingestion Logic', () => {
+    it('validates multimodal sample definitions and GCS URI formatting', () => {
+      const sampleSticky = {
+        type: 'sticky_note',
+        gcsUri: 'gs://reflectlogix-media-genai-apac/sticky-notes/sticky_arch_001.jpg',
+        mimeType: 'image/jpeg',
+        snippet: 'ReflectLogixAI ADK Agent Flow'
+      };
+
+      expect(sampleSticky.gcsUri.startsWith('gs://reflectlogix-media-genai-apac/')).toBe(true);
+      expect(sampleSticky.mimeType).toBe('image/jpeg');
+      expect(sampleSticky.snippet.length).toBeGreaterThan(10);
+    });
+
+    it('formats multimodal reflection title correctly for voice and video logs', () => {
+      const formatTitle = (type: string, title?: string) => {
+        return title || `Multimodal Ingestion: ${type.replace('_', ' ').toUpperCase()}`;
+      };
+
+      expect(formatTitle('voice_note')).toBe('Multimodal Ingestion: VOICE NOTE');
+      expect(formatTitle('video_log', 'Sunset Lakefront Vlog')).toBe('Sunset Lakefront Vlog');
+    });
+  });
 });

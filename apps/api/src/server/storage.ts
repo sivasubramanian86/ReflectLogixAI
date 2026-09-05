@@ -167,6 +167,195 @@ Grounding in what truly matters instantly recharged my focus and reaffirmed my c
           ],
           keyThemes: ['Resilience', 'Family Anchors', 'Work Boundaries']
         }
+      },
+      {
+        id: 'entry_003',
+        userId: adminUserId,
+        title: '10,480 Steps Nature Trail & Longevity Biological Reset',
+        content: `Completed a morning nature walk through the botanical sanctuary: 10,480 steps recorded on my connected smartwatch.
+Heart Rate Variability (HRV) hit a peak of 74ms with average resting heart rate settling at 56 bpm.
+Taking deep nasal breaths with 2-minute physiological sighs completely cleared the cognitive fog from yesterday's release sprint.
+Key realization: physical movement in morning sunlight is the ultimate natural catalyst for creative engineering problem solving.`,
+        language: 'English',
+        createdAt: Date.now() - 3600000 * 4,
+        updatedAt: Date.now() - 3600000 * 4,
+        tags: ['HealthSync', 'Longevity', '10kSteps', 'HRV', 'Neurobiology'],
+        wordCount: 68,
+        tokenCountEstimated: 98,
+        location: {
+          placeName: 'Cubbon Green Sanctuary, Bangalore',
+          latitude: 12.9763,
+          longitude: 77.5929,
+          privacyPrecision: 'neighborhood'
+        },
+        reflection: {
+          summary: 'High vitality morning session integrating 10k steps, autonomic nervous system regulation via physiological sighs, and peak cardiovascular recovery.',
+          bilingualSummary: {
+            detectedLanguage: 'English',
+            originalSummary: 'High vitality morning session integrating 10k steps, autonomic nervous system regulation via physiological sighs, and peak cardiovascular recovery.',
+            englishSummary: 'High vitality morning session integrating 10k steps, autonomic nervous system regulation, and peak cardiovascular recovery.',
+            keyPhrases: ['10,480 steps', 'HRV 74ms', 'Physiological sigh', 'Morning sunlight']
+          },
+          moodAnalysis: {
+            primaryMood: 'Energized',
+            secondaryMood: 'Joyful',
+            valence: 0.92,
+            arousal: 0.65,
+            stressLevel: 2,
+            tags: ['Peak Vitality', 'Autonomic Balance', 'Cardio Recovery'],
+            sentimentScore: 0.95
+          },
+          cognitiveStrengths: ['Biological self-optimization', 'Linking somatic wellness directly with mental clarity'],
+          reframeSuggestions: ['Treat daily nature walks not as time away from work, but as the high-leverage cognitive foundation of your best architecture.'],
+          socraticQuestions: [
+            'How did the physical sensation of the nature walk influence the clarity of your technical decisions today?'
+          ],
+          microActions: [
+            {
+              id: 'act_004',
+              title: 'Maintain 10k Daily Steps Target',
+              description: 'Take 15-minute walking meetings or audio note reflection during afternoon break.',
+              timeframe: 'habitual',
+              priority: 'high',
+              completed: true,
+              category: 'wellness'
+            }
+          ],
+          keyThemes: ['Longevity', 'Nature Grounding', 'Peak Performance']
+        }
+      },
+      {
+        id: 'entry_004',
+        userId: adminUserId,
+        title: 'Sticky Note Architecture Memo: ADK Zero-Trust Pipeline',
+        content: `Captured a handwritten sticky note memo on my desk while designing the multi-modal ingestion pipeline:
+"ReflectLogixAI ADK Agent Flow -> Grounding with pgvector -> Restorative sleep by 9pm."
+Extracted via Gemini 2.5 Flash Vision OCR into structured schema.
+Storing media assets with zero-trust envelope encryption in Google Cloud Storage: gs://reflectlogix-media-genai-apac/memos/sticky_arch_001.jpg.`,
+        language: 'English',
+        createdAt: Date.now() - 3600000 * 18,
+        updatedAt: Date.now() - 3600000 * 18,
+        attachments: [
+          {
+            id: 'att_001',
+            type: 'image',
+            name: 'sample_sticky_note.jpg',
+            mimeType: 'image/jpeg',
+            dataUrl: '/assets/sample_sticky_note.jpg',
+            transcription: 'ReflectLogixAI ADK Agent Flow -> Grounding with pgvector -> Restorative sleep by 9pm',
+            uploadedAt: Date.now() - 3600000 * 18
+          }
+        ],
+        tags: ['MultiModal', 'StickyNote', 'CloudStorage', 'ADK', 'VisionOCR'],
+        wordCount: 56,
+        tokenCountEstimated: 82,
+        location: {
+          placeName: 'ReflectLogix AI Lab, Cloud Hub',
+          latitude: 12.9716,
+          longitude: 77.5946,
+          privacyPrecision: 'neighborhood'
+        },
+        reflection: {
+          summary: 'Synthesized multimodal sticky note memo into structured multi-agent architecture with automated GCS bucket storage attribution.',
+          bilingualSummary: {
+            detectedLanguage: 'English',
+            originalSummary: 'Synthesized multimodal sticky note memo into structured multi-agent architecture with automated GCS bucket storage attribution.',
+            englishSummary: 'Synthesized multimodal sticky note memo into structured multi-agent architecture with automated GCS bucket storage attribution.',
+            keyPhrases: ['Sticky note memo', 'Gemini Vision OCR', 'Cloud Storage bucket']
+          },
+          moodAnalysis: {
+            primaryMood: 'Inspired',
+            secondaryMood: 'Reflective',
+            valence: 0.85,
+            arousal: 0.58,
+            stressLevel: 2,
+            tags: ['Multimodal Ingestion', 'Creative Synthesis', 'Architecture Vision'],
+            sentimentScore: 0.88
+          },
+          cognitiveStrengths: ['Multimodal synthesis', 'Translating quick tactile notes into structured cloud infrastructure'],
+          reframeSuggestions: ['Quick physical sketches capture raw intuition that formal digital typing often filters out.'],
+          socraticQuestions: [
+            'What other tactile or handwritten artifacts could feed your long-term reflection graph?'
+          ],
+          microActions: [
+            {
+              id: 'act_005',
+              title: 'Digitize Daily Whiteboard Memos',
+              description: 'Snap quick snapshot of end-of-day desk memos for automated GCS archival.',
+              timeframe: 'today',
+              priority: 'medium',
+              completed: true,
+              category: 'productivity'
+            }
+          ],
+          keyThemes: ['Multimodal AI', 'Tactile Notes', 'Vision OCR']
+        }
+      },
+      {
+        id: 'entry_005',
+        userId: adminUserId,
+        title: 'Mindful Sunset Vlog & 3-Year Life Horizons Reflection',
+        content: `Recorded a 1-minute sunset video reflection by the lake.
+Reflected on the 3-Year Horizon Goal: Publishing open-source multi-agent frameworks while maintaining a 94/100 Financial & Mental Peace Score.
+Gemini Multimodal Video analysis detected calm emotional coherence, even pitch cadence, and clear articulation of personal life milestones.`,
+        language: 'English',
+        createdAt: Date.now() - 3600000 * 48,
+        updatedAt: Date.now() - 3600000 * 48,
+        attachments: [
+          {
+            id: 'att_002',
+            type: 'image',
+            name: 'sample_video_thumbnail.jpg',
+            mimeType: 'image/jpeg',
+            dataUrl: '/assets/sample_video_thumbnail.jpg',
+            transcription: 'Sunset mindful reflection: Peaceful alignment with long-term engineering and life balance goals.',
+            uploadedAt: Date.now() - 3600000 * 48
+          }
+        ],
+        tags: ['VideoLog', 'SunsetReflection', 'LifePlanner', 'PeaceScore', 'Multimodal'],
+        wordCount: 51,
+        tokenCountEstimated: 79,
+        location: {
+          placeName: 'Sunset Lakefront, Bangalore',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          privacyPrecision: 'city'
+        },
+        reflection: {
+          summary: 'Multimodal video reflection synthesizing emotional grounding with multi-horizon predictive life planning and peace metrics.',
+          bilingualSummary: {
+            detectedLanguage: 'English',
+            originalSummary: 'Multimodal video reflection synthesizing emotional grounding with multi-horizon predictive life planning and peace metrics.',
+            englishSummary: 'Multimodal video reflection synthesizing emotional grounding with multi-horizon predictive life planning and peace metrics.',
+            keyPhrases: ['Sunset video log', '3-Year Horizon Goal', 'Financial peace 94/100']
+          },
+          moodAnalysis: {
+            primaryMood: 'Calm',
+            secondaryMood: 'Grateful',
+            valence: 0.88,
+            arousal: 0.32,
+            stressLevel: 1,
+            tags: ['Sunset Grounding', 'Long-term Horizons', 'Inner Peace'],
+            sentimentScore: 0.92
+          },
+          cognitiveStrengths: ['Long-term perspective taking', 'Holistic alignment between career excellence and personal tranquility'],
+          reframeSuggestions: ['Notice how viewing life in multi-year horizons dissolves short-term daily friction.'],
+          socraticQuestions: [
+            'What is the single most essential ritual protecting your peace of mind over the coming quarter?'
+          ],
+          microActions: [
+            {
+              id: 'act_006',
+              title: 'Review Weekly Peace Score Dashboard',
+              description: 'Spend Sunday morning reviewing time saved and mental tranquility indices.',
+              timeframe: 'this_week',
+              priority: 'high',
+              completed: false,
+              category: 'mindset'
+            }
+          ],
+          keyThemes: ['Life Horizons', 'Multimodal Video', 'Peace & Balance']
+        }
       }
     ];
     this.journals.set(adminUserId, sampleJournals);

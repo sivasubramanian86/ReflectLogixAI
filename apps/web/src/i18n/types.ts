@@ -6,9 +6,16 @@ export interface TranslationDictionary {
   // Navigation
   nav: {
     journal: string;
+    multimodal?: string;
+    healthSync?: string;
+    lifestyleFlashcards?: string;
+    lifePlanner?: string;
     agenticRag: string;
     knowledgeGraph: string;
     analytics: string;
+    about?: string;
+    faq?: string;
+    settings?: string;
     admin: string;
     architecture: string;
     notifications: string;
@@ -16,6 +23,20 @@ export interface TranslationDictionary {
     language: string;
     roleUser: string;
     roleAdmin: string;
+    dailyCheckin?: string;
+    newReflection?: string;
+  };
+
+  multimodal?: {
+    title: string;
+    subtitle: string;
+    gcsBucket: string;
+    analyzeBtn: string;
+    analyzing: string;
+    stickyNote: string;
+    handwrittenNote: string;
+    voiceNote: string;
+    videoLog: string;
   };
 
   // Timeline / Left Pane

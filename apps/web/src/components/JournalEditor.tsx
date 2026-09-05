@@ -255,7 +255,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Morning thoughts, pacing, and intentional boundaries..."
+            placeholder={t.editor.titlePlaceholder || 'e.g., Morning thoughts, pacing, and intentional boundaries...'}
             className="w-full rounded-2xl glass-input px-4 py-3 text-base font-semibold placeholder:text-[var(--text-muted)] focus-ring"
           />
         </div>
@@ -263,7 +263,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
         {/* Life Areas Quick Selector */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-            Life Areas & Focus
+            {t.editor.tagsLabel || 'Life Areas & Focus'}
           </label>
           <div className="flex flex-wrap gap-2">
             {lifeAreas.map((area) => {
@@ -293,7 +293,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
               htmlFor="journal-content-textarea"
               className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider"
             >
-              Reflection Canvas
+              {t.editor.writeReflection || 'Reflection Canvas'}
             </label>
 
             {/* Voice Dictation Trigger */}
@@ -309,12 +309,12 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
               {isRecording ? (
                 <>
                   <MicOff className="h-4 w-4 text-rose-500" />
-                  <span>Recording ({recordingSeconds}s)</span>
+                  <span>{t.editor.recording || 'Recording'} ({recordingSeconds}s)</span>
                 </>
               ) : (
                 <>
                   <Mic className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                  <span>Dictate Thoughts</span>
+                  <span>{t.editor.recordVoiceBtn || 'Dictate Thoughts'}</span>
                 </>
               )}
             </button>
@@ -327,15 +327,15 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             aria-label="Your journal entry reflection text"
-            placeholder="What is on your mind today? Write freely without worrying about perfection. You can explore a challenge, celebrate a small win, or simply check in with your breath..."
+            placeholder={t.editor.contentPlaceholder || 'What is on your mind today? Write freely without worrying about perfection. You can explore a challenge, celebrate a small win, or simply check in with your breath...'}
             className="w-full flex-1 rounded-2xl glass-input p-5 text-base leading-relaxed placeholder:text-[var(--text-muted)] focus-ring resize-y min-h-[220px]"
           />
 
           <div className="flex flex-wrap items-center justify-between gap-2 mt-2 text-xs text-[var(--text-muted)] px-1">
             <div className="flex items-center space-x-3">
-              <span>{wordCount} words</span>
+              <span>{wordCount} {t.editor.wordCount || 'words'}</span>
               <span>•</span>
-              <span>{readingTimeMinutes} min read</span>
+              <span>{readingTimeMinutes} {t.editor.readingTime || 'min read'}</span>
             </div>
             <div className="flex items-center space-x-1.5 text-teal-600 dark:text-teal-400">
               <Shield className="h-3.5 w-3.5" />
@@ -387,7 +387,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                 onChange={(e) => setIsSensitive(e.target.checked)}
                 className="h-4 w-4 rounded accent-teal-600"
               />
-              <span>Sensitive Entry</span>
+              <span>{t.editor.sensitiveEntry || 'Sensitive Entry'}</span>
             </label>
 
             <label className="flex items-center space-x-1.5 cursor-pointer">
@@ -397,7 +397,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                 onChange={(e) => setDetoxMode(e.target.checked)}
                 className="h-4 w-4 rounded accent-teal-600"
               />
-              <span>Detox Mode</span>
+              <span>{t.editor.detoxMode || 'Detox Mode'}</span>
             </label>
           </div>
         </div>
@@ -410,7 +410,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             className="flex items-center space-x-2 px-8 py-3.5 rounded-2xl bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-bold text-base shadow-sm hover:scale-[1.01] transition-all focus-ring min-h-[50px]"
           >
             <Sparkles className="h-5 w-5" />
-            <span>{isSubmitting ? 'Reflecting with Coach...' : 'Save & Receive Reflection'}</span>
+            <span>{isSubmitting ? (t.editor.saving || 'Reflecting with Coach...') : (t.editor.saveAndAnalyze || 'Save & Receive Reflection')}</span>
           </button>
         </div>
       </form>

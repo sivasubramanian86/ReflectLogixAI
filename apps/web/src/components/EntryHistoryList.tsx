@@ -118,7 +118,7 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
           <div className="flex items-center space-x-2">
             <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
             <h2 className="text-base font-bold text-[var(--text-primary)]">
-              Reflections Timeline
+              {t.timeline.title || 'Reflections Timeline'}
             </h2>
           </div>
           <button
@@ -127,14 +127,14 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
             className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs focus-ring"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>New Reflection</span>
+            <span>{t.timeline.newEntry || 'New Reflection'}</span>
           </button>
         </div>
 
         {/* High Contrast Search Input */}
         <div className="relative">
           <label htmlFor="entry-search-input" className="sr-only">
-            Search reflections by title, thoughts, or tags
+            {t.timeline.searchPlaceholder || 'Search thoughts, tags, themes...'}
           </label>
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
           <input
@@ -142,7 +142,7 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search thoughts, tags, themes..."
+            placeholder={t.timeline.searchPlaceholder || 'Search thoughts, tags, themes...'}
             className="w-full rounded-xl glass-input pl-10 pr-3.5 py-2.5 text-sm placeholder:text-[var(--text-muted)] focus-ring"
           />
         </div>
@@ -155,7 +155,7 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
               onChange={(e) => setMoodFilter(e.target.value)}
               className="w-full rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
             >
-              <option value="all">All States</option>
+              <option value="all">{t.timeline.allMoods || 'All States'}</option>
               {availableMoods.filter((m) => m !== 'all').map((m) => (
                 <option key={m} value={m}>
                   {m}
@@ -170,7 +170,7 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
               onChange={(e) => setTagFilter(e.target.value)}
               className="w-full rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)] font-medium focus-ring cursor-pointer"
             >
-              <option value="all">All Life Areas</option>
+              <option value="all">{t.timeline.allTags || 'All Life Areas'}</option>
               {allTags.map((tg) => (
                 <option key={tg} value={tg}>
                   #{tg}
@@ -189,7 +189,7 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
               <Calendar className="h-6 w-6" />
             </div>
             <p className="text-sm text-[var(--text-muted)] font-medium">
-              No reflections found matching your criteria.
+              {t.timeline.noEntriesFound || 'No reflections found matching your criteria.'}
             </p>
           </div>
         ) : (
@@ -198,10 +198,10 @@ export const EntryHistoryList: React.FC<EntryHistoryListProps> = ({
             if (!groupList || groupList.length === 0) return null;
 
             const groupTitleMap = {
-              today: 'Today',
-              yesterday: 'Yesterday',
-              thisWeek: 'This Week',
-              earlier: 'Earlier Reflections',
+              today: t.timeline.todayGroup || 'Today',
+              yesterday: t.timeline.yesterdayGroup || 'Yesterday',
+              thisWeek: t.timeline.thisWeekGroup || 'This Week',
+              earlier: t.timeline.earlierGroup || 'Earlier Reflections',
             };
 
             return (

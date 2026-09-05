@@ -55,7 +55,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   onNewEntryClick,
   children,
 }) => {
-  const { currentLanguage, setLanguage, supportedLanguages } = useI18n();
+  const { t, currentLanguage, setLanguage, supportedLanguages } = useI18n();
   const { theme, toggleTheme } = useTheme();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -99,67 +99,73 @@ export const AppShell: React.FC<AppShellProps> = ({
   const navItems = [
     {
       id: 'journal' as const,
-      label: 'My Journal',
+      label: t.nav.journal || 'My Journal',
       icon: BookOpen,
       adminOnly: false,
     },
     {
+      id: 'multimodal' as const,
+      label: t.nav.multimodal || 'Multi-Modal Media Studio',
+      icon: Sparkles,
+      adminOnly: false,
+    },
+    {
       id: 'health_sync' as const,
-      label: 'Health & Wearables',
+      label: t.nav.healthSync || 'Health & Wearables',
       icon: Heart,
       adminOnly: false,
     },
     {
       id: 'lifestyle_flashcards' as const,
-      label: 'Longevity Flashcards',
+      label: t.nav.lifestyleFlashcards || 'Longevity Flashcards',
       icon: Sparkles,
       adminOnly: false,
     },
     {
       id: 'life_planner' as const,
-      label: 'Life & Goals Planner',
+      label: t.nav.lifePlanner || 'Life & Goals Planner',
       icon: Compass,
       adminOnly: false,
     },
     {
       id: 'insights' as const,
-      label: 'Insights & Trends',
+      label: t.nav.analytics || 'Insights & Trends',
       icon: TrendingUp,
       adminOnly: false,
     },
     {
       id: 'ask_history' as const,
-      label: 'Deep Reflections',
+      label: t.nav.agenticRag || 'Deep Reflections',
       icon: BookOpen,
       adminOnly: false,
     },
     {
       id: 'knowledge_graph' as const,
-      label: 'Journey Map',
+      label: t.nav.knowledgeGraph || 'Journey Map',
       icon: Globe,
       adminOnly: false,
     },
     {
       id: 'about' as const,
-      label: 'About ReflectLogixAI',
+      label: t.nav.about || 'About ReflectLogixAI',
       icon: Heart,
       adminOnly: false,
     },
     {
       id: 'faq' as const,
-      label: 'FAQ & Help',
+      label: t.nav.faq || 'FAQ & Help',
       icon: HelpCircle,
       adminOnly: false,
     },
     {
       id: 'settings' as const,
-      label: 'Settings',
+      label: t.nav.settings || 'Settings',
       icon: Settings,
       adminOnly: false,
     },
     {
       id: 'admin' as const,
-      label: 'Space Settings',
+      label: t.nav.admin || 'Space Settings',
       icon: ShieldCheck,
       adminOnly: true,
     },
@@ -213,7 +219,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   </span>
                 </div>
                 <p className="hidden sm:block text-xs text-[var(--text-muted)] font-medium">
-                  Your Personal Life Reflection & Mindful Haven
+                  {t.appSubtitle || 'Your Personal Life Reflection & Mindful Haven'}
                 </p>
               </div>
             </div>
@@ -243,10 +249,10 @@ export const AppShell: React.FC<AppShellProps> = ({
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    {filterKey === 'all' && 'All Entries'}
-                    {filterKey === 'today' && 'Today'}
-                    {filterKey === 'week' && 'This Week'}
-                    {filterKey === 'month' && 'This Month'}
+                    {filterKey === 'all' && (t.timeline.allTime || 'All Entries')}
+                    {filterKey === 'today' && (t.timeline.today || 'Today')}
+                    {filterKey === 'week' && (t.timeline.thisWeek || 'This Week')}
+                    {filterKey === 'month' && (t.timeline.thisMonth || 'This Month')}
                   </button>
                 ))}
               </div>
@@ -263,7 +269,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               aria-label="Open daily check-in"
             >
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Daily Check-in</span>
+              <span className="hidden sm:inline">{t.nav.dailyCheckin || 'Daily Check-in'}</span>
             </button>
 
             {/* Language Dropdown Menu */}
@@ -283,7 +289,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               {isLangMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-2xl glass-card border border-white/40 dark:border-white/10 shadow-2xl p-1.5 z-50 max-h-72 overflow-y-auto">
                   <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-subtle)] mb-1">
-                    Select Language (18+ supported)
+                    {t.nav.language || 'Select Language'} (18+)
                   </div>
                   {supportedLanguages.map((lang) => (
                     <button
@@ -350,10 +356,10 @@ export const AppShell: React.FC<AppShellProps> = ({
                 <div className="absolute right-0 mt-2 w-64 rounded-2xl glass-card border border-white/40 dark:border-white/10 shadow-2xl p-2 z-50 space-y-1">
                   <div className="p-2.5 border-b border-[var(--border-subtle)]">
                     <p className="text-sm font-bold text-[var(--text-primary)] truncate">
-                      {user?.displayName || 'Sivasubramanian'}
+                      {user?.displayName || 'Siva'}
                     </p>
                     <span className="inline-block mt-1 px-2.5 py-0.5 rounded-md bg-teal-500/10 text-[10px] font-bold text-teal-700 dark:text-teal-300">
-                      {user?.role === 'admin' ? 'Workspace Admin' : 'Personal Journaler'}
+                      {user?.role === 'admin' ? (t.nav.roleAdmin || 'Admin View') : (t.nav.roleUser || 'User View')}
                     </span>
                   </div>
 
@@ -365,7 +371,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                     }}
                     className="w-full flex items-center justify-between p-2 rounded-xl text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
                   >
-                    <span>Switch to {user?.role === 'admin' ? 'Personal User' : 'Admin View'}</span>
+                    <span>Switch to {user?.role === 'admin' ? (t.nav.roleUser || 'User View') : (t.nav.roleAdmin || 'Admin View')}</span>
                   </button>
 
                   <button
@@ -377,7 +383,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                     className="w-full flex items-center space-x-2 p-2 rounded-xl text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
                   >
                     <Settings className="h-3.5 w-3.5" />
-                    <span>Preferences & Settings</span>
+                    <span>{t.nav.settings || 'Settings'}</span>
                   </button>
                 </div>
               )}
@@ -401,7 +407,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-all hover:scale-[1.01] focus-ring min-h-[46px]"
           >
             <Plus className="h-4 w-4" />
-            <span>New Reflection</span>
+            <span>{t.timeline.newEntry || 'New Reflection'}</span>
           </button>
 
           {/* Navigation Links */}
